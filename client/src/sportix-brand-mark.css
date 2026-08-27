@@ -1,0 +1,67 @@
+.sportix-wordmark-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: #f4f5f1;
+  font-family: var(--font-display, Arial, sans-serif);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.075em;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-logo > .sportix-wordmark-fallback {
+  width: 144px;
+  height: 68px;
+  font-size: 1.3rem;
+}
+
+.permanent-footer > .sportix-wordmark-fallback {
+  width: 118px;
+  height: 68px;
+  font-size: 1rem;
+}
+
+.contact-form-intro > .sportix-wordmark-fallback {
+  width: 216px;
+  min-height: 216px;
+  font-size: 1.65rem;
+}
+
+.partner-gateway-logo.sportix-wordmark-fallback {
+  width: 100px;
+  min-height: 26px;
+  margin-bottom: 32px;
+  font-size: 16px;
+}
+
+@media (max-width: 900px) {
+  .site-logo > .sportix-wordmark-fallback {
+    display: inline-flex;
+    width: 112px;
+    height: 58px;
+    font-size: 1.05rem;
+  }
+
+  .contact-form-intro > .sportix-wordmark-fallback {
+    width: 172px;
+    min-height: 172px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 780px) {
+  .partner-gateway-logo.sportix-wordmark-fallback {
+    width: 78px;
+    margin-bottom: 18px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo-kinetic.sportix-wordmark-fallback {
+    animation: sportix-logo-breathe 5.8s ease-in-out infinite;
+  }
+}

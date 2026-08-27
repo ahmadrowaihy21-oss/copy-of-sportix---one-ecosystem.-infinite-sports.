@@ -1,5 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
+import SportixBrandMark from "../components/SportixBrandMark";
 import { ArrowRight, Check, CircleAlert, ImagePlus, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
 import React, { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import "../partner-auth.css";
@@ -89,7 +90,7 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
     <div className="partner-gateway-grid" aria-hidden="true" />
     <section className="partner-gateway-shell">
       <aside className="partner-gateway-brand">
-        <img src={logoUrl} alt="SPORTIX" className="partner-gateway-logo" />
+        <SportixBrandMark alt="SPORTIX" className="partner-gateway-logo" />
         <p className="partner-gateway-eyebrow">SPORTIX / PARTNERS</p>
         <h1>THE PARTNER<br /><em>GATEWAY.</em></h1>
         <p>Secure access to the SPORTIX Partners environment. Authenticate to continue into the platform.</p>

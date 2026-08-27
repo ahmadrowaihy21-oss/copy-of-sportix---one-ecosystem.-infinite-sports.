@@ -3,6 +3,7 @@ import React, { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import "../brand-refinement.css";
 import { trpc } from "@/lib/trpc";
+import SportixBrandMark from "../components/SportixBrandMark";
 import {
   Activity,
   ArrowDownLeft,
@@ -37,7 +38,6 @@ import {
   X,
 } from "lucide-react";
 
-const logoUrl = "/manus-storage/sportix-ecosystem-approved-logo_e0eb06c5.png";
 const heroImage = "/manus-storage/sportix-runner-cinematic_f1ab034b.jpg";
 const loopFilmUrl = "/manus-storage/sportix-master-film-continuous-audio_8e66c45f.mp4";
 
@@ -307,7 +307,7 @@ export function ContactForm({ isArabic = false }: { isArabic?: boolean }) {
     <section id="contact" className="contact-section contact-section-form">
       <div className="contact-form-shell section-shell">
         <div className="contact-form-intro">
-          <img className="logo-kinetic" src={logoUrl} alt="SPORTIX" />
+          <SportixBrandMark className="logo-kinetic" alt="SPORTIX" />
           <p className="eyebrow">{copy.eyebrow}</p>
           <h2>{copy.title}</h2>
           <p>{copy.intro}</p>
@@ -345,7 +345,7 @@ function ArabicHome({ onSwitch, onLogout, isProjectAdmin }: { onSwitch: () => vo
       <div className="site-grain" aria-hidden="true" />
       <header className="permanent-header">
         <a className="site-logo logo-dynamic" href="#top" onClick={closeMenu} aria-label="الرئيسية">
-          <img src={logoUrl} alt="SPORTIX" />
+          <SportixBrandMark alt="SPORTIX" />
         </a>
         <div className="ar-header-actions">
           {isProjectAdmin && <a className="language-switch partner-profile-link" href="/admin/memberships">الإدارة</a>}
@@ -426,7 +426,7 @@ function ArabicHome({ onSwitch, onLogout, isProjectAdmin }: { onSwitch: () => vo
 
         <ContactForm isArabic />
       </main>
-      <footer className="permanent-footer"><img className="logo-kinetic" src={logoUrl} alt="SPORTIX" /><span>هوية رياضية واحدة. لكل رياضة.</span><span>© 2026 SPORTIX · المملكة العربية السعودية</span></footer>
+      <footer className="permanent-footer"><SportixBrandMark className="logo-kinetic" alt="SPORTIX" /><span>هوية رياضية واحدة. لكل رياضة.</span><span>© 2026 SPORTIX · المملكة العربية السعودية</span></footer>
     </div>
   );
 }
@@ -453,7 +453,7 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
 
       <header className="permanent-header">
         <a className="site-logo logo-dynamic" href="#top" onClick={closeMenu} aria-label="SPORTIX home">
-          <img src={logoUrl} alt="SPORTIX" />
+          <SportixBrandMark alt="SPORTIX" />
         </a>
 
         <div className="header-actions">
@@ -637,7 +637,7 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
             <div><p className="eyebrow">FOOTBALL TRANSFORMATION / STRATEGIC VERTICAL</p><h2>ONE PLAYER.<br /><em>A COMPLETE PATH.</em></h2></div>
             <p>Football is where SPORTIX takes one identity deeper: from a player&apos;s first verified moment to an academy pathway, a club opportunity, and better-supported human decisions.</p>
           </div>
-          <div className="football-brand-ceremony" aria-hidden="true"><img className="logo-kinetic" src={logoUrl} alt="" /></div>
+          <div className="football-brand-ceremony" aria-hidden="true"><SportixBrandMark className="logo-kinetic" alt="" /></div>
           <div className="section-shell football-stage">
             <div className="football-field" aria-label="Football Transformation pathway visual">
               <span className="field-label field-label-top">FOOTBALL ID / PROGRESSION RECORD</span>
@@ -836,7 +836,7 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
       </main>
 
       <footer className="permanent-footer">
-        <img className="logo-kinetic" src={logoUrl} alt="SPORTIX" />
+        <SportixBrandMark className="logo-kinetic" alt="SPORTIX" />
         <span>ONE SPORT ID. EVERY SPORT.</span>
         <span>© 2026 SPORTIX · SAUDI ARABIA</span>
       </footer>
