@@ -41,6 +41,13 @@ import {
 const heroImage = "/manus-storage/sportix-runner-cinematic_f1ab034b.jpg";
 const loopFilmUrl = "/manus-storage/sportix-master-film-continuous-audio_8e66c45f.mp4";
 
+type HeaderNavigationItem = { href: string; label: string };
+
+export const headerNavigationItems: Record<"english" | "arabic", ReadonlyArray<HeaderNavigationItem>> = {
+  english: [],
+  arabic: [],
+};
+
 const participationLoop = [
   {
     number: "01",
@@ -356,12 +363,7 @@ function ArabicHome({ onSwitch, onLogout, isProjectAdmin }: { onSwitch: () => vo
           </button>
         </div>
         <nav className={`permanent-nav ${menuOpen ? "open" : ""}`} aria-label="التنقل الرئيسي">
-          <a href="#journey" onClick={closeMenu}>المسار</a>
-          <a href="#film" onClick={closeMenu}>الفيلم</a>
-          <a href="#football" onClick={closeMenu}>كرة القدم</a>
-          <a href="#ecosystem" onClick={closeMenu}>المنظومة</a>
-          <a href="/go-sportix" onClick={closeMenu}>GO SPORTIX</a>
-          <a href="/marketplace" onClick={closeMenu}>المتجر</a>
+          {headerNavigationItems.arabic.map(item => <a key={item.href} href={item.href} onClick={closeMenu}>{item.label}</a>)}
           <a className="nav-cta" href="#contact" onClick={closeMenu}>ابدأ الحوار <ArrowUpLeft size={14} /></a>
         </nav>
       </header>
@@ -475,12 +477,7 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
         </div>
 
         <nav className={`permanent-nav ${menuOpen ? "open" : ""}`} aria-label="Primary navigation">
-          <a href="#loop" onClick={closeMenu}>THE LOOP</a>
-          <a href="#film" onClick={closeMenu}>THE FILM</a>
-          <a href="#football" onClick={closeMenu}>FOOTBALL</a>
-          <a href="#esports" onClick={closeMenu}>ESPORTS</a>
-          <a href="/go-sportix" onClick={closeMenu}>GO SPORTIX</a>
-          <a href="/marketplace" onClick={closeMenu}>MARKETPLACE</a>
+          {headerNavigationItems.english.map(item => <a key={item.href} href={item.href} onClick={closeMenu}>{item.label}</a>)}
           <a className="nav-cta" href="#contact" onClick={closeMenu}>
             START A CONVERSATION <ArrowUpRight size={14} />
           </a>
