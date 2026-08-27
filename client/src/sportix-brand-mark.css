@@ -1,67 +1,69 @@
-.sportix-wordmark-fallback {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  color: #f4f5f1;
-  font-family: var(--font-display, Arial, sans-serif);
-  font-size: 1rem;
-  font-weight: 900;
-  letter-spacing: 0.075em;
-  line-height: 1;
-  text-decoration: none;
-  white-space: nowrap;
+.sportix-brand-mark {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  vertical-align: middle;
+  background: #060706;
 }
 
-.site-logo > .sportix-wordmark-fallback {
-  width: 144px;
-  height: 68px;
-  font-size: 1.3rem;
+.sportix-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(198, 245, 0, .16));
+  transform: translateZ(0);
 }
 
-.permanent-footer > .sportix-wordmark-fallback {
-  width: 118px;
-  height: 68px;
-  font-size: 1rem;
+.sportix-brand-mark::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: -22%;
+  bottom: -22%;
+  left: -42%;
+  width: 22%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.93), rgba(198,245,0,.58), transparent);
+  transform: skewX(-19deg) translateX(-340%);
+  mix-blend-mode: screen;
 }
 
-.contact-form-intro > .sportix-wordmark-fallback {
-  width: 216px;
-  min-height: 216px;
-  font-size: 1.65rem;
-}
-
-.partner-gateway-logo.sportix-wordmark-fallback {
-  width: 100px;
-  min-height: 26px;
-  margin-bottom: 32px;
-  font-size: 16px;
-}
+.site-logo.logo-dynamic::after { display: none; }
+.site-logo > .sportix-brand-mark { width: 112px; height: 68px; }
+.permanent-footer > .sportix-brand-mark { width: 104px; height: 68px; }
+.contact-form-intro > .sportix-brand-mark { width: 216px; height: 216px; }
+.partner-gateway-logo.sportix-brand-mark { width: 126px; height: 126px; margin-bottom: 24px; }
 
 @media (max-width: 900px) {
-  .site-logo > .sportix-wordmark-fallback {
-    display: inline-flex;
-    width: 112px;
-    height: 58px;
-    font-size: 1.05rem;
-  }
-
-  .contact-form-intro > .sportix-wordmark-fallback {
-    width: 172px;
-    min-height: 172px;
-    font-size: 1.3rem;
-  }
+  .site-logo > .sportix-brand-mark { display: inline-grid; width: 88px; height: 58px; }
+  .contact-form-intro > .sportix-brand-mark { width: 172px; height: 172px; }
 }
 
 @media (max-width: 780px) {
-  .partner-gateway-logo.sportix-wordmark-fallback {
-    width: 78px;
-    margin-bottom: 18px;
-    font-size: 14px;
-  }
+  .partner-gateway-logo.sportix-brand-mark { width: 100px; height: 100px; margin-bottom: 18px; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .logo-kinetic.sportix-wordmark-fallback {
-    animation: sportix-logo-breathe 5.8s ease-in-out infinite;
-  }
+  .sportix-brand-mark::after { animation: sportix-brand-shine 6.4s cubic-bezier(.23, 1, .32, 1) infinite; }
+  .sportix-brand-mark img { animation: sportix-brand-glow 5.8s ease-in-out infinite; }
+}
+
+@keyframes sportix-brand-shine {
+  0%, 57% { transform: skewX(-19deg) translateX(-340%); opacity: 0; }
+  60% { opacity: 1; }
+  73% { transform: skewX(-19deg) translateX(780%); opacity: .88; }
+  76%, 100% { transform: skewX(-19deg) translateX(780%); opacity: 0; }
+}
+
+@keyframes sportix-brand-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(198, 245, 0, .16)); }
+  50% { filter: drop-shadow(0 0 13px rgba(198, 245, 0, .42)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sportix-brand-mark::after,
+  .sportix-brand-mark img { animation: none; }
 }

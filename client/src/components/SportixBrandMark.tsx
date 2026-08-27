@@ -7,5 +7,7 @@ type SportixBrandMarkProps = {
 };
 
 export default function SportixBrandMark({ alt = "SPORTIX", className = "" }: SportixBrandMarkProps) {
-  return <strong className={`sportix-wordmark-fallback ${className}`.trim()} role="img" aria-label={alt}>SPORTIX</strong>;
+  return <span className={`sportix-brand-mark ${className}`.trim()}>
+    <img src="/manus-storage/sportix-official-logo_e33eff89.png" alt={alt} decoding="async" />
+  </span>;
 }
