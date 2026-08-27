@@ -14,3 +14,5 @@
 - The authorised **Reject** action completed for the demo applicant and removed it from the pending-approval view; the next check verifies the rejected-record filter before resetting the demo account.
 - The Rejected filter was selected after the decision; a transient browser-extension timeout delayed the rendered confirmation, so database state is checked before the final reset.
 - After the Hooks fix, the owner session reached the private Contact Inquiries dashboard without the former React render error; the dashboard rendered its protected layout and zero-record state before a later extension timeout.
+- The partner gateway now exposes a separate `PROJECT ADMIN? SIGN IN WITH MANUS` action. Its component test confirmed it invokes only the Manus sign-in flow and does not send the project owner through partner-password authentication.
+- The targeted test suite, TypeScript check, and production build passed. Two subsequent owner-browser inspection attempts timed out, so the visual follow-up remains available to the owner through the new explicit action.

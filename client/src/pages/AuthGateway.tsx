@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
+import { startLogin } from "@/const";
 import { ArrowRight, Check, CircleAlert, ImagePlus, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
-import { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import "../partner-auth.css";
 import "../partner-profile.css";
 
@@ -106,6 +107,7 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
           <label>Password<input type="password" autoComplete="current-password" value={login.password} onChange={event => setLogin({ ...login, password: event.target.value })} required /></label>
           <button className="partner-primary" disabled={loginMutation.isPending}>{loginMutation.isPending ? "AUTHENTICATING…" : <>LOG IN <ArrowRight size={17} /></>}</button>
           <button type="button" className="partner-text-action" onClick={() => setMessage("Password recovery is not yet enabled. Contact SPORTIX Partners using your account email.")}>Forgot Password?</button>
+          <button type="button" className="partner-text-action" onClick={() => startLogin()}>PROJECT ADMIN? SIGN IN WITH MANUS <ArrowRight size={15} /></button>
         </form>}
         {step === "signup" && <form className="partner-gateway-stage partner-signup" onSubmit={submitSignup}>
           <button type="button" className="partner-back" onClick={() => selectStep("landing")}>← BACK</button><Mail size={26} className="partner-gateway-icon" /><p className="partner-gateway-kicker">NEW PARTNER</p><h2>CREATE <em>ACCESS.</em></h2>
