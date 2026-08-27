@@ -1,8 +1,10 @@
 import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
-import { Check, CircleAlert, Eye, ShieldAlert, UserRoundCheck, X } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Check, CircleAlert, Eye, LogOut, ShieldAlert, UserRoundCheck, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import "../membership-requests.css";
+import "../admin-logout.css";
 
 const statusLabels = {
   email_unverified: "Email unverified",
@@ -26,6 +28,7 @@ export default function MembershipRequests() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [accessLevel, setAccessLevel] = useState<"level_1" | "level_2" | "level_3">("level_1");
+  const { logout: logoutProjectAdmin, loading: isProjectLogoutPending } = useAuth();
   const query = trpc.membership.list.useQuery(filter === "all" ? undefined : { status: filter });
   const legal = trpc.membership.ndaDetail.useQuery({ accountId: selectedId ?? 0 }, { enabled: selectedId !== null });
   const utils = trpc.useUtils();
@@ -41,8 +44,13 @@ export default function MembershipRequests() {
   };
   const askForMore = () => { if (selected && note.trim().length >= 4) requestMore.mutate({ accountId: selected.id, note: note.trim() }); };
 
+  const handleProjectLogout = async () => {
+    await logoutProjectAdmin();
+    window.location.assign("/");
+  };
+
   return <main className="membership-admin">
-    <header className="membership-admin-header"><div><p>SPORTIX / CONTROL ROOM</p><h1>MEMBERSHIP <em>REQUESTS.</em></h1><span>Review verified partner profiles and control platform access.</span></div><ShieldAlert size={34} /></header>
+    <header className="membership-admin-header"><div><p>SPORTIX / CONTROL ROOM</p><h1>MEMBERSHIP <em>REQUESTS.</em></h1><span>Review verified partner profiles and control platform access.</span></div><div className="membership-admin-header-actions"><button type="button" className="membership-admin-logout" onClick={() => void handleProjectLogout()} disabled={isProjectLogoutPending}><LogOut size={15} /> {isProjectLogoutPending ? "SIGNING OUT…" : "LOG OUT"}</button><ShieldAlert size={34} /></div></header>
     <nav className="membership-admin-filters" aria-label="Membership filters">{(["pending_approval", "active", "rejected", "suspended", "email_unverified", "all"] as FilterStatus[]).map(item => <button key={item} onClick={() => { setFilter(item); setSelectedId(null); }} className={filter === item ? "active" : ""}>{item === "all" ? "All records" : statusLabels[item]}</button>)}</nav>
     {isForbidden ? <section className="membership-admin-restricted"><ShieldAlert size={28} /><p>ADMIN ACCESS REQUIRED</p><h2>THIS CONTROL ROOM IS RESTRICTED.</h2><span>Only authorised SPORTIX administrators can review member records or make membership decisions.</span><button type="button" onClick={() => startLogin()}>SIGN IN AS PROJECT ADMIN <span>→</span></button></section> : <>{error && <p className="membership-admin-error"><CircleAlert size={16} /> {error}</p>}
     {query.isLoading ? <p className="membership-admin-empty">Loading protected membership records…</p> : <section className="membership-admin-table" aria-label="Protected membership requests"><div className="membership-admin-row membership-admin-head"><span>Applicant</span><span>Verification</span><span>Organisation</span><span>Registered</span><span>Status</span><span /></div>{query.data?.map(account => <button key={account.id} className="membership-admin-row" onClick={() => setSelectedId(account.id)}><span><strong>{account.fullName}</strong><small>{account.email}<br />{account.mobileNumber}</small></span><span>{account.emailVerifiedAt ? <b className="verified"><Check size={14} /> Email verified</b> : <b>Unverified</b>}</span><span>{account.companyName || "—"}<small>{account.jobTitle || ""}</small></span><span>{new Date(account.createdAt).toLocaleDateString()}</span><span><i className={`membership-status ${account.status}`}>{statusLabels[account.status]}</i></span><span><Eye size={17} /></span></button>)}</section>}

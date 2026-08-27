@@ -1,0 +1,37 @@
+.membership-admin-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  color: #c7ff00;
+}
+
+.membership-admin-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #444940;
+  background: transparent;
+  color: #f5f5f1;
+  padding: 11px 13px;
+  font: 800 10px/1 Inter, Arial, sans-serif;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: color 160ms var(--ease-out, ease-out), border-color 160ms var(--ease-out, ease-out), background 160ms var(--ease-out, ease-out), transform 160ms var(--ease-out, ease-out);
+}
+
+.membership-admin-logout:hover:not(:disabled),
+.membership-admin-logout:focus-visible {
+  outline: none;
+  border-color: #c7ff00;
+  background: #c7ff00;
+  color: #070807;
+}
+
+.membership-admin-logout:active:not(:disabled) { transform: scale(.97); }
+.membership-admin-logout:disabled { cursor: wait; opacity: .65; }
+
+@media (max-width: 760px) {
+  .membership-admin-header-actions { gap: 12px; }
+  .membership-admin-logout { padding: 10px; }
+  .membership-admin-logout svg { display: none; }
+}

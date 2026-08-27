@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import "../brand-refinement.css";
 import { trpc } from "@/lib/trpc";
 import SportixBrandMark from "../components/SportixBrandMark";
+import { useAuth } from "@/_core/hooks/useAuth";
 import {
   Activity,
   ArrowDownLeft,
@@ -47,6 +48,10 @@ export const headerNavigationItems: Record<"english" | "arabic", ReadonlyArray<H
   english: [],
   arabic: [],
 };
+
+export function shouldShowHeaderLogout(isProjectAdmin: boolean, hasPartnerSession: boolean) {
+  return isProjectAdmin || hasPartnerSession;
+}
 
 const participationLoop = [
   {
@@ -357,7 +362,7 @@ function ArabicHome({ onSwitch, onLogout, isProjectAdmin }: { onSwitch: () => vo
         <div className="ar-header-actions">
           {isProjectAdmin && <a className="language-switch partner-profile-link" href="/admin/memberships">الإدارة</a>}
           <button className="language-switch" type="button" onClick={onSwitch} aria-label="Switch to English">EN</button>
-          {!isProjectAdmin && <button className="language-switch" type="button" onClick={onLogout} aria-label="تسجيل الخروج">خروج</button>}
+          <button className="language-switch" type="button" onClick={onLogout} aria-label="تسجيل الخروج">خروج</button>
           <button className="mobile-menu" onClick={() => setMenuOpen((open) => !open)} aria-label="فتح القائمة" aria-expanded={menuOpen}>
             {menuOpen ? <X size={21} /> : <Menu size={21} />}
           </button>
@@ -439,7 +444,15 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
   const closeMenu = () => setMenuOpen(false);
   const partnerLogout = trpc.partnerAuth.logout.useMutation({ onSuccess: () => window.location.assign("/") });
   const partnerProfile = trpc.partnerAuth.session.useQuery();
-  const logout = () => partnerLogout.mutate();
+  const { logout: logoutProjectAdmin, loading: isProjectLogoutPending } = useAuth();
+  const logout = () => {
+    if (isProjectAdmin) {
+      void logoutProjectAdmin();
+      return;
+    }
+    partnerLogout.mutate();
+  };
+  const isLogoutPending = isProjectAdmin ? isProjectLogoutPending : partnerLogout.isPending;
 
   useEffect(() => {
     document.documentElement.lang = isArabic ? "ar" : "en";
@@ -465,7 +478,7 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
           </div>}
           {isProjectAdmin ? <a className="language-switch partner-profile-link" href="/admin/memberships">CONTROL ROOM</a> : <a className="language-switch partner-profile-link" href="/profile">PROFILE</a>}
           <button className="language-switch" type="button" onClick={() => setIsArabic(true)} aria-label="التبديل إلى العربية">العربية</button>
-          {!isProjectAdmin && <button className="language-switch" type="button" onClick={logout} disabled={partnerLogout.isPending} aria-label="Log out">{partnerLogout.isPending ? "…" : "LOG OUT"}</button>}
+          {shouldShowHeaderLogout(isProjectAdmin, Boolean(partnerProfile.data)) && <button className="language-switch" type="button" onClick={logout} disabled={isLogoutPending} aria-label="Log out">{isLogoutPending ? "…" : "LOG OUT"}</button>}
           <button
             className="mobile-menu"
             onClick={() => setMenuOpen((open) => !open)}
