@@ -1,0 +1,3 @@
+# Marketplace visual research
+
+The image review confirmed that a controlled studio treatment is the right visual direction for a premium sports marketplace: off-centre lighting, restrained shadows, visible texture, and a clean product stage create useful focus without competing with the SPORTIX identity. The selected implementation will therefore use the project’s approved SPORTIX mark and original CSS product silhouettes rather than importing third-party product imagery into the shipping prototype. This keeps the interface brand-safe and makes the product catalogue clearly demonstrative rather than a live merchant listing.

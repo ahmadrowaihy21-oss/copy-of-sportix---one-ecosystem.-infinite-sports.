@@ -1,0 +1,5 @@
+- [x] Replace remaining coming-soon messaging with the permanent SPORTIX ecosystem narrative.
+- [x] Rebuild the homepage around the connective intelligence layer, three platform layers, and the activity-to-opportunity flywheel.
+- [x] Add the virtual 15-mind advisory-board chapter and 24-month execution proof path.
+- [x] Implement the permanent navigation, partner contact path, and updated final call to action.
+- [x] Verify desktop and mobile layouts, interactions, build quality, and visual accessibility.

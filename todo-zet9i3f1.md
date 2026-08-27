@@ -1,0 +1,12 @@
+- [x] Review the approved SPORTIX strategy and translate it into a focused homepage narrative.
+- [x] Reframe the homepage around movement, QR-governed participation, SPORT ID, platform-owned points, and community growth.
+- [x] Add the partner QR Check-in entry for fitness and strength centres without claiming it measures full performance.
+- [x] Present walking, running, cycling, and strength training as entry sports within one SPORTIX identity.
+- [x] Sequence Computer Vision as consent-based SPORT ID enrichment after governed participation.
+- [x] Apply the visual review pass: reduce broad lime usage, add low-light athletic observation frames, and harden editorial analysis sections.
+- [x] Verify desktop and mobile presentation, navigation, and build quality.
+- [x] Save a validated project checkpoint and prepare the delivery summary.
+- [x] Define the reusable multi-sport platform strategy and web-narrative skill scope.
+- [x] Initialize the new skill and author its workflow and templates.
+- [x] Upload and adopt the approved SPORTIX Ecosystem logo across the website chrome.
+- [x] Validate and package the skill for delivery.

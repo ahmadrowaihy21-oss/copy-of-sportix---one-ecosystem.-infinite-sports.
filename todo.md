@@ -1,0 +1,141 @@
+- [x] Add the requested understated founder signature beneath the final Coming Soon label.
+- [x] Verify the signature’s desktop and mobile alignment, spacing, and SPORTIX color treatment.
+- [x] Replace the final CTA with the supplied Contact Us mail link while preserving the visual treatment.
+- [x] Verify the Contact Us CTA at desktop and mobile breakpoints.
+- [x] Add the integrated EVA AFTER-H prospective-provider section with compliant wording and supplied artwork.
+- [x] Build the provider journey, Match Room concept, architecture panel, category expansion, and B2B CTA.
+- [x] Verify the prospective-provider disclosures and responsive experience on desktop and mobile.
+- [x] Add the distinct SPORTIX AI SYSTEMS identity alongside the Ecosystem brand without merging or recoloring either mark.
+- [x] Add external AI SYSTEMS navigation and the compact Powered to Learn relationship preview linking to sportixai.manus.space.
+- [x] Verify the external links, brand separation, and responsive layout across the homepage.
+- [x] Remove the specified “From Padel Courts” and “One Ecosystem” provider-expansion statement block.
+- [x] Verify the surrounding provider section remains continuous after the removal.
+- [x] Clarify that check-in and verification apply only where supported by the sport, activity, and provider configuration.
+- [x] Verify the adjusted provider-journey language in the responsive layout.
+- [x] Remove all check-in and verification references from the provider journey, architecture, and operational tool labels.
+- [x] Verify that surrounding SPORTIX provider content remains continuous after the removal.
+- [x] Stage and use the newly supplied official SPORTIX Ecosystem mark without modification.
+- [x] Reframe SPORTIX content as a multi-sport, sport-agnostic ecosystem serving athletes, organisations, and institutions.
+- [x] Add the governed hidden-talent pathway and the Hidden Talent Gap narrative without overstating automated talent discovery.
+- [x] Verify sport diversity, talent-pathway claims, and responsive presentation across the website.
+- [x] Identify the visual distortions in the latest SPORTIX video master and the affected generated clips.
+- [x] Regenerate only the affected SPORTIX video sequences with stronger continuity controls.
+- [x] Assemble and verify the corrected SPORTIX video master.
+- [x] Replace the tennis play scene with a tennis athlete consulting a coach while holding her racquet.
+- [x] Add a realistic school football-pitch scene with visible cameras around the field.
+- [x] Reassemble and verify the revised SPORTIX Loop film.
+- [x] Remove the tennis chapter entirely from the SPORTIX Loop film.
+- [x] Replace it with a realistic bodybuilding athlete-development sequence.
+- [x] Reassemble and verify the tennis-free SPORTIX Loop master.
+- [x] Publish the final SPORTIX Loop film as a managed web asset.
+- [x] Add a responsive, premium SPORTIX Loop film section to the homepage.
+- [x] Verify the embedded video on desktop and mobile before delivery.
+- [x] Superseded: identify the supplied SPORTIX master film and map its timestamped restoration requirements.
+- [x] Superseded: prepare a non-destructive, timestamp-specific artifact-restoration blueprint.
+- [x] Superseded: restore approved visual defects while preserving the original narrative, people, VFX, and soundtrack.
+- [x] Superseded: reassemble and validate the final high-resolution SPORTIX master.
+- [x] Superseded: confirm the duration, intended audience, narration, and music requirements for the new SPORTIX master film.
+- [x] Superseded: lock the multi-sport visual references, recurring athletes, and SPORTIX green VFX rules.
+- [x] Superseded: produce the timestamped sports sequence with controlled identity and object continuity.
+- [x] Superseded: assemble and validate the new 4K, 16:9, 30 fps SPORTIX master film.
+- [x] Remove the kettlebell sequence from the active SPORTIX master-film edit.
+- [x] Reassemble and verify the revised SPORTIX master without the kettlebell scene.
+- [x] Remove the existing final four seconds from the current SPORTIX master.
+- [x] Build a new exactly four-second closing animation from the supplied official SPORTIX Ecosystem logo reference without altering its brand geometry.
+- [x] Reassemble and technically verify the updated 4K, 30 fps, 100-second SPORTIX master.
+- [x] Map the narration, score, ambience, and official-closing stems and their overlap points.
+- [x] Create a new dialogue-first mix with ducked music, muted ambience under narration, and controlled closing audio.
+- [x] Replace only the audio track and verify the revised 4K SPORTIX master.
+- [x] Generate a narration-safe replacement score with intentional dialogue windows and a separate official-close resolution.
+- [x] Rebuild the final soundtrack from the new score, isolated narration, and controlled closing sound only.
+- [x] Generate the approved cycling, fencing-entry, progress-to-guidance, and Strength & Bodybuilding Development scenes.
+- [x] Rebuild the football strategic-peak, human-judgement, community, and forward-motion sequence without legacy racquet-sport material.
+- [x] Create the approved narration-priority score, narration spans, and signal-led cue structure.
+- [x] Assemble and validate the approved 100-second 4K master with the official four-second SPORTIX arrival close.
+- [x] Remove all existing narration, score, ambience, and foreground sound layers from the current master audio track.
+- [x] Generate one continuous energetic score and a revised, naturally paced male narration performance.
+- [x] Replace the master audio with the score plus narrator only, then validate the clean 4K delivery master.
+- [x] Publish the approved continuous-audio SPORTIX master as a managed web asset.
+- [x] Replace the homepage video source with the approved SPORTIX master.
+- [x] Verify the updated homepage film section on desktop and mobile.
+- [x] Add an English/Arabic language control to the SPORTIX header.
+- [x] Add Arabic translations and right-to-left layout behavior for the public SPORTIX experience.
+- [x] Verify both language modes at desktop and mobile breakpoints.
+- [x] Upgrade the project with a backend-ready foundation for contact submissions.
+- [x] Replace the contact CTA with a validated premium inline SPORTIX contact form in English and Arabic.
+- [x] Add a polished confirmation state and submission foundation suitable for business-email or backend connection.
+- [x] Verify validation, confirmation, and responsive form presentation on desktop and mobile.
+- [x] Audit the current public contact endpoint, submission persistence, and missing email-delivery path.
+- [x] Configure a transactional email provider, sender, and SPORTIX inquiry recipient for verified delivery.
+- [x] Add secure server-side rate protection, spam controls, delivery status logging, and failure-aware API responses.
+- [x] Add real-time neon-red client validation and a protected admin page to view, sort, and manage contact messages.
+- [x] Complete and verify an actual Form → Backend → Database → Email end-to-end test submission.
+- [x] Confirm whether the requested domain is sportixpartnars.com or the existing SPORTIX domain sportixpartners.com before any DNS change.
+- [x] Add only the exact Resend DKIM, SPF MX, SPF TXT, and approved DMARC DNS records after they are retrieved from the Resend dashboard.
+- [x] Verify public DNS resolution, Resend domain verification, and delivery to sportixpartners@gmail.com.
+- [x] Configure contact@sportixpartners.com as the verified sender and sportixpartners@gmail.com as the SPORTIX inquiry recipient.
+- [x] Capture the accepted Resend email ID and final delivery result from the real SPORTIX contact-form test.
+- [x] Add the exact Resend DKIM, SPF MX, SPF TXT, and DMARC TXT records in the already open Manus DNS editor without editing existing SPORTIX records.
+- [x] Extend contact_messages with provider delivery state, provider message ID, error details, recipient metadata, and audit timestamps.
+- [x] Implement server-only Resend REST delivery after secure database persistence, with an error response unless Resend accepts the send.
+- [x] Add IP-aware server-side throttling and a honeypot field without exposing anti-spam controls in the public SPORTIX form.
+- [x] Build an authenticated admin inquiry dashboard using adminProcedure with list, filter, detail, and status-update controls.
+- [x] Add delivery, spam-protection, and admin-authorization Vitest coverage alongside the existing form tests.
+- [x] Submit a real inquiry through the rendered SPORTIX website form, then verify its database record, Resend email ID, and Delivered provider status.
+- [x] Add change-time required-field feedback and verify the existing neon-red error treatment on the public contact form.
+- [x] Add Vitest coverage proving honeypot short-circuit behavior and rate-limit rejection behavior.
+- [x] Audit the user-submitted browser verification by subject, then reconcile its database record, Resend acceptance, and visible inbox delivery status.
+- [x] Add authenticated dashboard sort controls and verify the displayed inquiry ordering.
+- [x] Add a rendered contact-form error-state test that proves the neon-red inline treatment is applied.
+- [x] Capture browser evidence of the public contact form with a visible inline validation error.
+- [x] Trigger a required-field error in the live SPORTIX browser form and capture the visible neon-red inline state.
+- [x] Add an integration-style honeypot submission test proving the router avoids database and Resend calls.
+- [x] Add required email address and mobile number fields to the bilingual SPORTIX public contact form.
+- [x] Validate, persist, and protect the new email and mobile fields in the tRPC contact contract and database schema.
+- [x] Include the sender-provided email and mobile number in a professional, accessible SPORTIX HTML notification email with a plain-text alternative.
+- [x] Test and visually verify the extended form, email payload, database migration, and production build.
+- [x] Submit a controlled post-change inquiry and verify the saved email/mobile fields plus the live Resend HTML and text payload.
+- [x] Gate every public SPORTIX Partners route behind authenticated, email-verified access without changing the existing partner website content.
+- [x] Add secure local account storage with hashed passwords, email-verified state, profile fields, sessions, and single-use expiring verification codes.
+- [x] Implement server-side sign-up, login, email-code delivery, verification, resend, and password/session protections.
+- [x] Build the SPORTIX Partners first-screen gateway with premium Login, Sign Up, and Verify Your Email flows.
+- [x] Prove that direct internal URLs are blocked for unauthenticated visitors and verified accounts enter the existing website.
+- [x] Complete a controlled Sign Up → verification email → correct-code verification → partner-session → existing-site-entry browser test.
+- [x] Reconfirm that an unauthenticated direct internal URL remains blocked after the verified-session test.
+- [x] Enter a live verification code directly in the browser verification screen and capture the resulting verified-site entry.
+- [x] Capture an explicit fresh unauthenticated internal-route browser response showing the gateway instead of existing SPORTIX content.
+- [x] Add a minimal secure session logout control to the authenticated SPORTIX Partners website.
+- [x] Add required athlete-profile registration questions: age, gender, weekly sport frequency, current sports, aspirational sport, sports problems, and a proposed solution idea.
+- [x] Add optional secure profile-image upload with image-type and size validation, server-side storage, and saved profile metadata.
+- [x] Persist, validate, and protect the complete athlete profile in SPORTIX Partners account storage and registration APIs.
+- [x] Display the authenticated partner's complete profile summary after verified account entry.
+- [x] Test the extended profile registration, secure image handling, validation, email verification, and existing-site access.
+- [x] Complete a live athlete-profile sign-up with all required answers, upload a valid image, and verify the saved account fields and image metadata.
+- [x] Verify the extended athlete-profile email code in the browser, then capture the authenticated `/profile` page with saved profile data and avatar.
+- [x] Preserve a pending email-verification screen across a safe browser reload without storing the verification code client-side.
+- [x] Complete one browser-only athlete-profile registration with a valid image upload, six-box code entry, and a captured authenticated `/profile` page showing the saved avatar.
+- [x] Add direct test coverage that a verified profile with a stored image URL renders an avatar image rather than an initial placeholder.
+- [x] Cancel mobile OTP, SMS-provider, country-code normalization, and mobile-verification work at the user's request.
+- [x] Enforce account states EMAIL_UNVERIFIED, PENDING_APPROVAL, ACTIVE, REJECTED, and SUSPENDED server-side.
+- [x] Build protected admin Membership Requests review and approval controls with email verification status, contact details, profile data, and registration details.
+- [x] Block protected platform access unless email verification and ACTIVE membership status both pass server-side.
+- [x] Test email verification, pending/rejected/suspended access, admin decisions, and the end-to-end approval flow.
+- [x] Complete a controlled live registration → email verification → pending Membership Request → administrator approval → activated platform-access test.
+- [x] Show a clear access-restricted state rather than an empty membership list when a non-admin opens the protected dashboard.
+- [x] Restart the server after the membership-state deployment and prove a fresh email verification persists PENDING_APPROVAL rather than ACTIVE.
+- [x] Add an explicit project-admin sign-in action on the access-restricted Membership Requests state so the owner can establish the required admin session on the preview domain.
+- [x] Restore the missing OAuth users table so the owner’s selected Manus account returns successfully to the protected dashboard.
+- [ ] Make Work Email required while Company Name, Job Title, and Mobile Number are optional; retain mobile as non-verifying profile data only.
+- [ ] Add versioned immutable NDA document, acceptance, authority, evidence, and audit data models with the user-specified legal metadata.
+- [ ] Require verified email → explicit unselected NDA acceptance → company-authority declaration before any membership request reaches admin review.
+- [ ] Implement the non-authorized representative path with secure PDF/JPG/PNG signed-company-NDA upload and a Pending Company NDA Review state.
+- [ ] Generate and store an immutable PDF evidence record for every NDA acceptance, and make it available to the user and administrator.
+- [ ] Extend protected Membership Requests with NDA status/version, authority decision, company document, evidence record, request-more-information, and review actions.
+- [ ] Enforce NDA_PENDING, COMPANY_AUTHORITY_PENDING, COMPANY_NDA_PENDING, PENDING_ADMIN_APPROVAL, APPROVED, REJECTED, and SUSPENDED at frontend, backend, API, and data layers.
+- [ ] Prepare Level 1, Level 2, and Level 3 access-level controls, with Level 3 requiring separate administrator approval.
+- [ ] Test every requested NDA, document, approval, direct-URL/API bypass, audit, and evidence path end-to-end.
+- [ ] Freeze the supplied Arabic NDA verbatim as Version 1.0, Document ID SPORTIX-NDA-AR-2026-001, Effective Date 2026-08-27, and store its computed SHA-256 snapshot.
+- [ ] Remove the public `/marketplace` route so the marketplace cannot bypass the SPORTIX Partners NDA-gated approval workflow.
+- [ ] Register Go SPORTIX, Weekly Legends, and SPORTIX Community as future protected sections with administrator-configurable Level 1–3 access requirements; do not build their content yet.
+- [ ] Register SPORT ID as a future protected section with administrator-configurable Level 1–3 access requirements; do not build its content yet.
+- [ ] Merge the newest GO SPORTIX code behind the NDA-gated approved-membership route guard, including its booking, cart, and checkout routes.

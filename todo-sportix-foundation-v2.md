@@ -1,0 +1,97 @@
+- [x] Translate the approved SPORTIX ecosystem into durable foundation, positioning, and operating-model references.
+- [x] Align the public landing page with Community, Match Room, Marketplace, SPORTIX Impact, Partner Loop, Weekly Legends, and Scouts & Clubs.
+- [ ] Verify type safety, build output, and desktop/mobile visual presentation before delivery, including Community, Marketplace, Weekly Legends, and Scouts & Clubs.
+- [ ] Verify terminology, message consistency, and readability across the new platform chapters.
+- [ ] Confirm that all public claims remain aligned with the approved SPORTIX governance boundaries.
+- [ ] Reconcile the landing-page narrative with the updated SPORTIX product operating model.
+- [ ] Complete final technical and visual review before checkpointing the updated experience.
+- [ ] Confirm the Weekly Legends attribution format before final delivery.
+- [ ] Ensure production data replaces the Weekly Legends store-name placeholder at runtime.
+- [x] Verify that navigation links resolve to all new platform sections.
+- [ ] Complete build and visual checks before treating the navigation review as release readiness.
+- [ ] Save a checkpoint only after the release-readiness checks are complete.
+- [ ] Deliver the updated site together with the SPORTIX positioning and operating-model references.
+- [ ] Verify that the landing page answers who SPORTIX is, the problems it solves, the value it provides, and its sustainability logic.
+- [ ] Separate future interactive-product validation from this approved narrative and visual alignment pass.
+- [ ] Treat payments, rewards, messaging, discovery, and AI recommendations as future product builds requiring their own verification gates.
+- [x] Freeze scope for this narrative and visual alignment pass before release-readiness review.
+- [x] Complete the planned content and structural edits for this pass.
+- [ ] Move to release-readiness verification and checkpointing.
+- [ ] Confirm output quality before marking the implementation pass complete.
+- [x] Lock the current content scope pending quality review.
+- [ ] Finalise release-readiness checks and save the approved state.
+- [ ] Deliver the final implementation summary after successful review and checkpoint.
+- [x] Stop scope additions pending release-readiness review.
+- [ ] Begin final review with no further scope changes unless a defect is found.
+- [ ] Review final output and checkpoint the implementation.
+- [x] Complete planned implementation edits; review and checkpoint remain.
+- [x] Close content-editing phase pending verification and save.
+- [ ] Verify release readiness without further content changes.
+- [x] Freeze implementation content until verification completes.
+- [ ] Complete release-readiness review and checkpoint final state.
+- [ ] Transition to verification phase now that the content scope is locked.
+- [x] Prepare the implementation for verification with no further planned content edits.
+- [ ] Run final review and capture the approved checkpoint.
+- [x] Finish all preparation tasks before final review.
+- [ ] Confirm release readiness and save final checkpoint.
+- [x] Complete narrative, documentation, and interface implementation scope.
+- [ ] Complete quality review and checkpoint final delivery state.
+- [x] Lock content changes pending verification.
+- [ ] Verify and checkpoint the final state before delivery.
+- [ ] Enter final review with content scope frozen.
+- [x] Freeze scope before final review.
+- [ ] Validate and save before presenting the completed work.
+- [x] Complete planned edits and enter verification-only mode.
+- [ ] Complete final review and save the approved checkpoint.
+- [x] Stop implementation edits pending review.
+- [ ] Conduct final review and checkpoint the release-ready version.
+- [x] Complete all scope changes for this release candidate.
+- [ ] Run validation and save the final checkpoint.
+- [x] Freeze the release candidate while validation is pending.
+- [ ] Complete quality validation and checkpoint before final delivery.
+- [x] Defer additional scope until after the verified release is saved.
+- [ ] Validate the release candidate and save the final checkpoint.
+- [x] Keep the release candidate frozen pending validation.
+- [ ] Complete the last validation and checkpoint before delivery.
+- [x] Freeze this version until release-readiness review completes.
+- [ ] Review and checkpoint final implementation before delivery.
+- [x] Lock scope while final verification is pending.
+- [ ] Complete final quality review and save checkpoint.
+- [x] Enter verification-only mode with scope frozen.
+- [ ] Complete quality checks before saving the release checkpoint.
+- [x] Close planned implementation edits pending verification.
+- [ ] Run final validation and save the verified release checkpoint.
+- [x] Finish release-content preparation.
+- [ ] Complete verification and checkpoint final state before delivery.
+- [x] Freeze scope for final verification.
+- [ ] Review, validate, and checkpoint before final delivery.
+- [x] Close content-editing tasks before final review.
+- [ ] Execute final verification and checkpoint the release candidate.
+- [x] Freeze all planned changes until verification is complete.
+- [ ] Complete final quality review and save the checkpoint for delivery.
+- [x] Conclude all implementation edits pending final verification.
+- [ ] Validate and checkpoint the final release candidate.
+- [x] Keep all changes frozen pending release validation.
+- [ ] Verify final quality and create the delivery checkpoint.
+- [x] Complete the content and interface scope for the release candidate.
+- [ ] Perform release verification and checkpoint final deliverables.
+- [x] Freeze all content and interface changes before final validation.
+- [ ] Complete validation and save the release checkpoint.
+- [x] Complete all planned implementation edits before verification.
+- [x] Consolidate the approved SPORTIX definition, problem-solution model, sustainability, and impact into a reusable strategic reference.
+- [ ] Complete final quality review and checkpoint before delivering the updated work.
+- [x] Lock all planned implementation changes pending final review.
+- [ ] Verify release quality and save final checkpoint.
+- [x] Freeze release candidate before final validation.
+- [ ] Complete validation and checkpoint the final implementation.
+- [x] Complete all planned content and interface changes for review.
+- [ ] Perform final quality validation and save a checkpoint.
+- [ ] Save a final checkpoint and prepare the implementation handoff.
+- [x] Build a dominant Football Transformation chapter in the public SPORTIX experience.
+- [x] Add a distinct Esports Gateway chapter without weakening the multi-sport identity.
+- [x] Apply a restrained dynamic light treatment to the approved SPORTIX Ecosystem logo across key website touchpoints.
+- [x] Apply the independent visual review pass: break up equal-weight grids, return athletic presence to the chapters, reserve lime for decisive signals, and elevate the brand-mark ritual.
+- [x] Verify desktop and mobile rendering and complete type-check and production build.
+- [x] Add an Opportunity screen with a structured club or scout offer.
+- [x] Make athlete consent, visible-data scope, and refusal options explicit in the flow.
+- [x] Verify Opportunity interactions on desktop and mobile before checkpointing.

@@ -1,0 +1,31 @@
+# Project TODO
+
+- [x] Review the current SPORTIX marketplace-related interface and preserve the approved Kinetic Intelligence identity.
+- [x] Build a responsive marketplace prototype with PRODUCTS, Coupons & Memberships, and SPORTIX Impact sections.
+- [x] Add clear prototype interactions for search, filtering, section navigation, saved products, offer copying, and impact exploration.
+- [x] Add focused unit coverage for marketplace content and interaction helpers.
+- [x] Validate TypeScript, test suite, and desktop/mobile visual presentation.
+- [x] Save a publish-ready checkpoint for the marketplace prototype.
+- [x] Add marketplace partner stores for extra electronics, SPORTIX sportswear, adidas footwear, and additional sports categories.
+- [x] Replace prototype benefits with car detailing, hotel, leisure-trip coupons, and a gym membership offer.
+- [x] Replace SPORTIX Impact initiatives with support for orphans, mosque construction, and home restoration for families in need.
+- [x] Re-validate the updated partner marketplace catalogue and impact copy across responsive layouts.
+- [x] Make the standalone Marketplace prototype publicly previewable without requiring partner sign-in, then verify desktop and mobile rendering.
+- [x] Include Marketplace data tests in Vitest and confirm they execute successfully.
+- [x] Record the desktop and mobile visual review for the public Marketplace route.
+- [x] Define prototype pricing, member points conversion, and redemption caps for cart checkout.
+- [x] Add cart interactions for adding, updating, and removing marketplace products.
+- [x] Create a public checkout page with an order summary, points redemption, and remaining cash total in Saudi Riyal.
+- [x] Add unit coverage for points conversion and checkout calculations.
+- [x] Validate cart and checkout flows across desktop and mobile, then save a new checkpoint.
+- [x] Add an interactive store filter for extra, SPORTIX, and adidas that composes with the current category and search filters.
+- [x] Add automated coverage for store filtering and validate the responsive filter controls.
+- [x] Define GO SPORTIX as a public discovery and booking experience for sports activities and community routes.
+- [x] Build a responsive GO SPORTIX page with activity discovery, sport filters, booking selections, and an activity detail panel.
+- [x] Link GO SPORTIX from SPORTIX navigation and preserve the public preview flow.
+- [x] Add unit coverage for activity filtering and booking-state calculations.
+- [x] Validate the GO SPORTIX experience on desktop and mobile, then save a new checkpoint.
+- [x] Record the desktop and mobile review of GO SPORTIX discovery, booking, and navigation states.
+- [x] Diagnose why the project owner cannot access the admin or partner area after sign-in.
+- [x] Correct the owner-admin access path without broadening permissions for other users.
+- [x] Add or update authorization tests, validate the fix, and save a checkpoint.
