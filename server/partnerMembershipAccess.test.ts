@@ -15,7 +15,33 @@ function caller() {
   return appRouter.createCaller(ctx);
 }
 
+function administratorCaller() {
+  const ctx: TrpcContext = {
+    user: {
+      id: 1,
+      openId: "sportix-demo-admin",
+      name: "SPORTIX Project Administrator",
+      email: "admin@sportix.test",
+      loginMethod: "manus",
+      role: "admin",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastSignedIn: new Date(),
+    },
+    req: { protocol: "https", headers: {}, socket: { remoteAddress: "203.0.113.20" } } as TrpcContext["req"],
+    res: { cookie: vi.fn(), clearCookie: vi.fn() } as TrpcContext["res"],
+  };
+  return appRouter.createCaller(ctx);
+}
+
 describe("SPORTIX Partner membership access", () => {
+  it("allows a Manus administrator to read protected membership records", async () => {
+    db.listPartnerMembershipRequests.mockResolvedValue([]);
+
+    await expect(administratorCaller().membership.list({ status: "approved" })).resolves.toEqual([]);
+    expect(db.listPartnerMembershipRequests).toHaveBeenCalledWith("approved");
+  });
+
   it.each([
     ["pending_approval", "Your membership is pending administrator approval."],
     ["rejected", "This membership request was not approved."],
