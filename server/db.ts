@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, isNull } from "drizzle-orm";
+import { and, desc, eq, gt, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { contactMessages, InsertContactMessage, InsertPartnerAccount, InsertUser, partnerAccounts, partnerMembershipAudits, partnerSessions, partnerVerificationCodes, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -237,9 +237,16 @@ export async function requestPartnerMoreInformation(accountId: number, note: str
 
 export type PartnerMembershipStatus = "email_unverified" | "nda_pending" | "company_authority_pending" | "company_nda_pending" | "pending_approval" | "pending_admin_approval" | "approved" | "active" | "rejected" | "suspended" | "pending" | "disabled";
 
+export function isActiveAccessStatus(status: PartnerMembershipStatus) {
+  return status === "approved" || status === "active";
+}
+
 export async function listPartnerMembershipRequests(status?: PartnerMembershipStatus) {
   const db = await getDb();
   if (!db) throw new Error("Partner account storage is temporarily unavailable");
+  if (status === "active") {
+    return db.select().from(partnerAccounts).where(or(eq(partnerAccounts.status, "approved"), eq(partnerAccounts.status, "active"))).orderBy(desc(partnerAccounts.createdAt)).limit(250);
+  }
   if (status) return db.select().from(partnerAccounts).where(eq(partnerAccounts.status, status)).orderBy(desc(partnerAccounts.createdAt)).limit(250);
   return db.select().from(partnerAccounts).orderBy(desc(partnerAccounts.createdAt)).limit(250);
 }

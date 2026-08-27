@@ -68,6 +68,8 @@ export default function Inquiries() {
   const updateStatus = trpc.contact.updateStatus.useMutation({
     onSuccess: () => inquiries.refetch().then(() => utils.contact.list.invalidate()),
   });
+  const orderedInquiries = useMemo(() => sortInquiries(inquiries.data ?? [], order), [inquiries.data, order]);
+  const selected = orderedInquiries.find(inquiry => inquiry.id === selectedId) ?? orderedInquiries[0];
 
   if (loading) return <div className="min-h-screen bg-black" />;
 
@@ -83,9 +85,6 @@ export default function Inquiries() {
       </div>
     );
   }
-
-  const orderedInquiries = useMemo(() => sortInquiries(inquiries.data ?? [], order), [inquiries.data, order]);
-  const selected = orderedInquiries.find(inquiry => inquiry.id === selectedId) ?? orderedInquiries[0];
 
   return (
     <DashboardLayout>

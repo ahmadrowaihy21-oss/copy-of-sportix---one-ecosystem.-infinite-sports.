@@ -140,3 +140,6 @@
 - [ ] Register SPORT ID as a future protected section with administrator-configurable Level 1–3 access requirements; do not build its content yet.
 - [ ] Merge the newest GO SPORTIX code behind the NDA-gated approved-membership route guard, including its booking, cart, and checkout routes.
 - [x] إنشاء حسابَي اختبار منفصلين لمسؤول وشريك عادي والتحقق من بوابات الدخول وحدود الصلاحيات.
+- [x] التحقق من دخول مالك المشروع عبر Manus بوصفه SPORTIX Super Admin ومن الوصول إلى لوحة الإدارة وإجراءات العضويات دون تغيير النموذج العام.
+- [x] إصلاح مرشح Active في Control Room ليعرض الحسابات Approved التي تملك وصولاً فعّالاً، ثم إعادة اختبار دورة الموافقة والرفض للحساب التجريبي.
+- [x] إصلاح خطأ React الخاص بترتيب Hooks في صفحة Admin Inquiries ثم إعادة التحقق من وصول Super Admin إليها.

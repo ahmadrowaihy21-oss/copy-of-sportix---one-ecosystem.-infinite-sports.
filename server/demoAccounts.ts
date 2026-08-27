@@ -2,6 +2,8 @@ import type { InsertPartnerAccount } from "../drizzle/schema";
 
 export const DEMO_PARTNER_EMAIL = "demo.partner@sportix.test";
 export const DEMO_PARTNER_NAME = "SPORTIX Demo Partner";
+export const DEMO_APPLICANT_EMAIL = "demo.applicant@sportix.test";
+export const DEMO_APPLICANT_NAME = "SPORTIX Demo Applicant";
 export const DEMO_ADMINISTRATOR_NAME = "SPORTIX Project Administrator";
 
 export function createApprovedDemoPartner(passwordHash: string): InsertPartnerAccount {
@@ -23,6 +25,18 @@ export function createApprovedDemoPartner(passwordHash: string): InsertPartnerAc
     emailVerifiedAt: new Date(),
     verificationMethod: "test_seed",
     verificationStatus: "verified",
+    accessLevel: "level_1",
+  };
+}
+
+export function createPendingDemoApplicant(passwordHash: string): InsertPartnerAccount {
+  return {
+    ...createApprovedDemoPartner(passwordHash),
+    fullName: DEMO_APPLICANT_NAME,
+    email: DEMO_APPLICANT_EMAIL,
+    companyName: "SPORTIX Applicant Organisation",
+    jobTitle: "Membership Applicant",
+    status: "pending_approval",
     accessLevel: "level_1",
   };
 }
