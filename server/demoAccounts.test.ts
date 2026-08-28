@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_APPLICANT_EMAIL, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createPendingDemoApplicant } from "./demoAccounts";
+import { DEMO_APPLICANT_EMAIL, DEMO_INDIVIDUAL_EMAIL, DEMO_INDIVIDUAL_OPEN_ID, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createPendingDemoApplicant, createPendingDemoIndividual } from "./demoAccounts";
 
 describe("demo account seed data", () => {
   it("creates an email-verified approved partner with basic access", () => {
@@ -24,6 +24,18 @@ describe("demo account seed data", () => {
       emailVerified: true,
       verificationStatus: "verified",
       accessLevel: "level_1",
+    });
+  });
+
+  it("creates an ordinary Manus user in the pending access queue", () => {
+    const user = createPendingDemoIndividual();
+
+    expect(user).toMatchObject({
+      openId: DEMO_INDIVIDUAL_OPEN_ID,
+      email: DEMO_INDIVIDUAL_EMAIL,
+      loginMethod: "manus",
+      role: "user",
+      accessStatus: "pending",
     });
   });
 });

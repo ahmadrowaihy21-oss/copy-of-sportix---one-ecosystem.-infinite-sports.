@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { partnerAccounts, users } from "../drizzle/schema.ts";
 import { getDb } from "../server/db.ts";
-import { DEMO_ADMINISTRATOR_NAME, DEMO_APPLICANT_EMAIL, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createPendingDemoApplicant } from "../server/demoAccounts.ts";
+import { DEMO_ADMINISTRATOR_NAME, DEMO_APPLICANT_EMAIL, DEMO_INDIVIDUAL_OPEN_ID, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createPendingDemoApplicant, createPendingDemoIndividual } from "../server/demoAccounts.ts";
 import { ENV } from "../server/_core/env.ts";
 import { hashPartnerPassword } from "../server/partnerAuth.ts";
 
@@ -86,12 +86,30 @@ await db
     },
   });
 
+const individual = createPendingDemoIndividual();
+await db
+  .insert(users)
+  .values(individual)
+  .onDuplicateKeyUpdate({
+    set: {
+      name: individual.name,
+      email: individual.email,
+      loginMethod: individual.loginMethod,
+      role: "user",
+      accessStatus: "pending",
+      accessReviewedAt: null,
+      accessReviewedBy: null,
+      lastSignedIn: now,
+    },
+  });
+
 const [administrator] = await db.select({ role: users.role }).from(users).where(eq(users.openId, ENV.ownerOpenId)).limit(1);
 const [demoPartner] = await db.select({ email: partnerAccounts.email, status: partnerAccounts.status, emailVerified: partnerAccounts.emailVerified, accessLevel: partnerAccounts.accessLevel }).from(partnerAccounts).where(eq(partnerAccounts.email, DEMO_PARTNER_EMAIL)).limit(1);
 const [demoApplicant] = await db.select({ email: partnerAccounts.email, status: partnerAccounts.status, emailVerified: partnerAccounts.emailVerified }).from(partnerAccounts).where(eq(partnerAccounts.email, DEMO_APPLICANT_EMAIL)).limit(1);
+const [demoIndividual] = await db.select({ openId: users.openId, accessStatus: users.accessStatus, role: users.role }).from(users).where(eq(users.openId, DEMO_INDIVIDUAL_OPEN_ID)).limit(1);
 
-if (administrator?.role !== "admin" || demoPartner?.status !== "approved" || !demoPartner.emailVerified || demoPartner.accessLevel !== "level_1" || demoApplicant?.status !== "pending_approval" || !demoApplicant.emailVerified) {
+if (administrator?.role !== "admin" || demoPartner?.status !== "approved" || !demoPartner.emailVerified || demoPartner.accessLevel !== "level_1" || demoApplicant?.status !== "pending_approval" || !demoApplicant.emailVerified || demoIndividual?.role !== "user" || demoIndividual.accessStatus !== "pending") {
   throw new Error("Demo-account verification failed.");
 }
 
-console.log(JSON.stringify({ administratorRole: administrator.role, partnerEmail: demoPartner.email, partnerStatus: demoPartner.status, partnerAccessLevel: demoPartner.accessLevel, applicantEmail: demoApplicant.email, applicantStatus: demoApplicant.status }));
+console.log(JSON.stringify({ administratorRole: administrator.role, partnerEmail: demoPartner.email, partnerStatus: demoPartner.status, partnerAccessLevel: demoPartner.accessLevel, applicantEmail: demoApplicant.email, applicantStatus: demoApplicant.status, individualOpenId: demoIndividual.openId, individualAccessStatus: demoIndividual.accessStatus }));

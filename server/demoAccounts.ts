@@ -1,10 +1,25 @@
-import type { InsertPartnerAccount } from "../drizzle/schema";
+import type { InsertPartnerAccount, InsertUser } from "../drizzle/schema";
 
 export const DEMO_PARTNER_EMAIL = "demo.partner@sportix.test";
 export const DEMO_PARTNER_NAME = "SPORTIX Demo Partner";
 export const DEMO_APPLICANT_EMAIL = "demo.applicant@sportix.test";
 export const DEMO_APPLICANT_NAME = "SPORTIX Demo Applicant";
 export const DEMO_ADMINISTRATOR_NAME = "SPORTIX Project Administrator";
+export const DEMO_INDIVIDUAL_OPEN_ID = "sportix-individual-access-demo";
+export const DEMO_INDIVIDUAL_EMAIL = "individual.demo@sportix.test";
+export const DEMO_INDIVIDUAL_NAME = "SPORTIX Individual Demo";
+
+export function createPendingDemoIndividual(): InsertUser {
+  return {
+    openId: DEMO_INDIVIDUAL_OPEN_ID,
+    name: DEMO_INDIVIDUAL_NAME,
+    email: DEMO_INDIVIDUAL_EMAIL,
+    loginMethod: "manus",
+    role: "user",
+    accessStatus: "pending",
+    lastSignedIn: new Date(),
+  };
+}
 
 export function createApprovedDemoPartner(passwordHash: string): InsertPartnerAccount {
   return {
