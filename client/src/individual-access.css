@@ -1,0 +1,245 @@
+.individual-access {
+  --acid: #c7ff00;
+  --ink: #050704;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: #f7faef;
+  background: #030502;
+  font-family: Arial, sans-serif;
+}
+
+.individual-access-background,
+.individual-access-stars,
+.individual-access::before,
+.individual-access::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.individual-access-background {
+  z-index: -4;
+  background: linear-gradient(90deg, rgba(2, 4, 2, .93) 0%, rgba(2, 4, 2, .5) 48%, rgba(2, 4, 2, .84) 100%), url("/manus-storage/sportix-space-launch-reference_802d7102.png") center / cover no-repeat;
+  transform: scale(1.04);
+  animation: access-background-drift 18s ease-in-out infinite alternate;
+}
+
+.individual-access::before {
+  z-index: -3;
+  content: "";
+  background: radial-gradient(ellipse at 50% 42%, rgba(199, 255, 0, .17), transparent 28%), linear-gradient(110deg, transparent 35%, rgba(216, 255, 86, .13) 48%, transparent 61%);
+  background-size: 100% 100%, 260% 100%;
+  animation: access-beam 6s linear infinite;
+}
+
+.individual-access::after {
+  z-index: -2;
+  content: "";
+  opacity: .45;
+  background-image: radial-gradient(circle at center, rgba(225, 255, 170, .9) 0 1px, transparent 1.5px), radial-gradient(circle at center, rgba(199, 255, 0, .85) 0 1px, transparent 1.5px);
+  background-size: 122px 122px, 211px 211px;
+  animation: access-stars 12s linear infinite;
+}
+
+.individual-access-stars {
+  z-index: -1;
+  opacity: .42;
+  background: repeating-radial-gradient(ellipse at 50% 50%, transparent 0 3.5%, rgba(199, 255, 0, .18) 3.8% 4%, transparent 4.25% 8%);
+  animation: access-warp 8s linear infinite;
+}
+
+.individual-access-header,
+.individual-access-footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px clamp(20px, 4vw, 68px);
+  color: rgba(247, 250, 239, .76);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .18em;
+}
+
+.individual-access-audio {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  border: 1px solid rgba(199, 255, 0, .72);
+  padding: 10px 13px;
+  color: var(--acid);
+  background: rgba(3, 5, 2, .5);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 160ms cubic-bezier(.23, 1, .32, 1), background-color 160ms ease;
+}
+
+.individual-access-audio:hover { background: rgba(199, 255, 0, .12); }
+.individual-access-audio:active { transform: scale(.97); }
+.individual-access-audio:focus-visible,
+.individual-access-contact:focus-visible,
+.individual-access-partner-link:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+
+.individual-access-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(760px, calc(100% - 40px));
+  margin: auto;
+  padding: 48px 0 32px;
+  text-align: center;
+}
+
+.individual-access-logo {
+  width: min(290px, 70vw);
+  height: 190px;
+  margin: 0 auto -12px;
+  filter: drop-shadow(0 0 24px rgba(199, 255, 0, .36));
+  animation: access-logo-launch 5s cubic-bezier(.23, 1, .32, 1) infinite alternate;
+}
+
+.individual-access-launch {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  width: min(420px, 86vw);
+  height: 260px;
+  overflow: hidden;
+  transform: translateX(-50%);
+  mask-image: linear-gradient(to bottom, transparent, #000 38%, transparent);
+}
+
+.individual-access-launch i {
+  position: absolute;
+  top: -18%;
+  width: 2px;
+  height: 82%;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, transparent, #fff 18%, var(--acid) 53%, transparent);
+  box-shadow: 0 0 16px var(--acid);
+  transform: rotate(22deg);
+  animation: access-thrust 2.4s linear infinite;
+}
+.individual-access-launch i:nth-child(1) { left: 16%; animation-delay: -.3s; }
+.individual-access-launch i:nth-child(2) { left: 50%; animation-delay: -1.25s; }
+.individual-access-launch i:nth-child(3) { left: 80%; animation-delay: -.8s; }
+
+.individual-access-kicker {
+  margin: 8px 0 18px;
+  color: var(--acid);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .2em;
+}
+
+.individual-access h1 {
+  margin: 0;
+  font-size: clamp(42px, 7vw, 80px);
+  line-height: .98;
+  letter-spacing: -.07em;
+}
+
+.individual-access-copy {
+  max-width: 590px;
+  margin: 22px auto 0;
+  color: rgba(247, 250, 239, .86);
+  font-size: clamp(16px, 2vw, 19px);
+  line-height: 1.85;
+}
+
+.individual-access-actions {
+  display: grid;
+  gap: 16px;
+  width: min(510px, 100%);
+  margin-top: 34px;
+}
+
+.individual-access-contact {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
+  min-height: 75px;
+  padding: 12px 18px;
+  color: #101400;
+  background: var(--acid);
+  text-decoration: none;
+  text-align: right;
+  box-shadow: 0 0 0 1px rgba(245, 255, 201, .68), 0 0 26px rgba(199, 255, 0, .35);
+  transition: transform 160ms cubic-bezier(.23, 1, .32, 1), box-shadow 160ms ease;
+}
+
+.individual-access-contact::before {
+  position: absolute;
+  z-index: -1;
+  top: -70%;
+  left: -38%;
+  width: 30%;
+  height: 240%;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .94), transparent);
+  transform: rotate(20deg);
+  animation: access-cta-shine 3.4s ease-in-out infinite;
+}
+
+.individual-access-contact:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px #fff, 0 0 38px rgba(199, 255, 0, .7); }
+.individual-access-contact:active { transform: scale(.98); }
+.individual-access-contact-icon { display: grid; place-items: center; width: 42px; height: 42px; color: #fff; background: #0c1104; box-shadow: 0 0 18px rgba(255,255,255,.36); }
+.individual-access-contact strong,
+.individual-access-contact small { display: block; }
+.individual-access-contact strong { font-size: 17px; }
+.individual-access-contact small { margin-top: 4px; font-size: 12px; font-weight: 700; }
+
+.individual-access-partner-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  color: #f7faef;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration-color: var(--acid);
+  text-underline-offset: 7px;
+}
+.individual-access-partner-link:hover { color: var(--acid); }
+
+.individual-access-footer { padding-top: 12px; font-size: 9px; }
+
+@keyframes access-background-drift { to { transform: scale(1.12) translate(-.8%, -.5%); } }
+@keyframes access-beam { to { background-position: 0 0, -260% 0; } }
+@keyframes access-stars { to { transform: scale(1.42); opacity: 0; } }
+@keyframes access-warp { to { transform: scale(1.65); opacity: 0; } }
+@keyframes access-logo-launch { 0% { transform: translateY(8px) scale(.98); } 100% { transform: translateY(-9px) scale(1.025); } }
+@keyframes access-thrust { from { transform: translateY(-45%) rotate(22deg); opacity: 0; } 24% { opacity: 1; } to { transform: translateY(155%) rotate(22deg); opacity: 0; } }
+@keyframes access-cta-shine { 0%, 64% { left: -38%; } 90%, 100% { left: 130%; } }
+
+@media (max-width: 620px) {
+  .individual-access-header { padding: 16px 18px; font-size: 8px; letter-spacing: .12em; }
+  .individual-access-header > span { max-width: 105px; line-height: 1.5; }
+  .individual-access-audio { padding: 9px; font-size: 9px; letter-spacing: 0; }
+  .individual-access-content { padding-top: 28px; }
+  .individual-access-logo { width: min(228px, 68vw); height: 145px; }
+  .individual-access-launch { top: 12%; height: 190px; }
+  .individual-access h1 { font-size: 46px; }
+  .individual-access-copy { font-size: 15px; line-height: 1.75; }
+  .individual-access-contact { min-height: 72px; padding: 10px 13px; }
+  .individual-access-contact strong { font-size: 15px; }
+  .individual-access-footer { padding: 13px 18px; font-size: 7px; letter-spacing: .09em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .individual-access *, .individual-access::before, .individual-access::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}

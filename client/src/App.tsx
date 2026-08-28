@@ -18,7 +18,9 @@ import Marketplace from "./pages/Marketplace";
 import MarketplaceCart from "./pages/MarketplaceCart";
 import MarketplaceCheckout from "./pages/MarketplaceCheckout";
 import GoSportix from "./pages/GoSportix";
+import IndividualAccess from "./pages/IndividualAccess";
 import { canBypassPartnerGateway } from "./pages/homeAccess";
+import { isAdminPath, isPartnerGatewayPath } from "./pages/individualAccessRoute";
 function Router() {
   const [location] = useLocation();
   const partnerSession = trpc.partnerAuth.session.useQuery();
@@ -26,7 +28,8 @@ function Router() {
   const utils = trpc.useUtils();
   const isProjectAdmin = canBypassPartnerGateway(projectSession.data?.role);
 
-  if (location.startsWith("/admin/")) {
+  if (isAdminPath(location)) {
+    if (projectSession.isLoading || !isProjectAdmin) return <IndividualAccess />;
     return <Switch>
       <Route path="/admin/memberships" component={MembershipRequests} />
       <Route path="/admin/inquiries" component={Inquiries} />
@@ -36,10 +39,10 @@ function Router() {
 
   // SPORTIX administrators authenticate through Manus OAuth, not the separate partner-password gateway.
   // The server remains the authority for all protected administrator operations.
-  if (projectSession.isLoading) return <div className="min-h-screen bg-black" />;
+  if (isPartnerGatewayPath(location)) return <AuthGateway onAuthenticated={() => utils.partnerAuth.session.invalidate()} />;
+  if (projectSession.isLoading || partnerSession.isLoading) return <IndividualAccess />;
   if (isProjectAdmin && location === "/") return <Home isProjectAdmin />;
-  if (partnerSession.isLoading) return <div className="min-h-screen bg-black" />;
-  if (!partnerSession.data) return <AuthGateway onAuthenticated={() => utils.partnerAuth.session.invalidate()} />;
+  if (!partnerSession.data) return <IndividualAccess />;
   if (!(["active", "approved"] as const).includes(partnerSession.data.status as "active" | "approved")) return <NdaGate account={partnerSession.data} onChanged={() => utils.partnerAuth.session.invalidate()} />;
 
   return (
