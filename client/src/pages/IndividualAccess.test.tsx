@@ -9,6 +9,7 @@ describe("IndividualAccess", () => {
     const { container } = render(<IndividualAccess />);
 
     expect(screen.getByRole("link", { name: /تواصل مع المؤسس/i }).getAttribute("href")).toBe("tel:+966545022063");
+    expect(screen.getByRole("button", { name: /سجّل أو ادخل بحسابك الشخصي/i })).toBeTruthy();
     expect(screen.getByRole("link", { name: /اخرج وعاود الدخول بإيميل شركتك/i }).getAttribute("href")).toBe("/partner-access");
     const audioButton = screen.getByRole("button", { name: /تشغيل التجربة الصوتية/i });
     expect(audioButton.getAttribute("aria-pressed")).toBe("false");

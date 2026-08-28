@@ -49,8 +49,8 @@ export const headerNavigationItems: Record<"english" | "arabic", ReadonlyArray<H
   arabic: [],
 };
 
-export function shouldShowHeaderLogout(isProjectAdmin: boolean, hasPartnerSession: boolean) {
-  return isProjectAdmin || hasPartnerSession;
+export function shouldShowHeaderLogout(isProjectAdmin: boolean, hasPartnerSession: boolean, hasIndividualAccess = false) {
+  return isProjectAdmin || hasPartnerSession || hasIndividualAccess;
 }
 
 const participationLoop = [
@@ -348,7 +348,7 @@ export function ContactForm({ isArabic = false }: { isArabic?: boolean }) {
 }
 
 /** Kinetic Intelligence, Arabic edition: right-to-left editorial SPORTIX experience with controlled lime signals and black cinematic space. */
-function ArabicHome({ onSwitch, onLogout, isProjectAdmin }: { onSwitch: () => void; onLogout: () => void; isProjectAdmin: boolean }) {
+function ArabicHome({ onSwitch, onLogout, isProjectAdmin, hasIndividualAccess }: { onSwitch: () => void; onLogout: () => void; isProjectAdmin: boolean; hasIndividualAccess: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -360,7 +360,7 @@ function ArabicHome({ onSwitch, onLogout, isProjectAdmin }: { onSwitch: () => vo
           <SportixBrandMark alt="SPORTIX" />
         </a>
         <div className="ar-header-actions">
-          {isProjectAdmin && <a className="language-switch partner-profile-link" href="/admin/memberships">الإدارة</a>}
+          {isProjectAdmin ? <a className="language-switch partner-profile-link" href="/admin/memberships">الإدارة</a> : hasIndividualAccess ? <span className="language-switch partner-profile-link">وصول معتمد</span> : null}
           <button className="language-switch" type="button" onClick={onSwitch} aria-label="Switch to English">EN</button>
           <button className="language-switch" type="button" onClick={onLogout} aria-label="تسجيل الخروج">خروج</button>
           <button className="mobile-menu" onClick={() => setMenuOpen((open) => !open)} aria-label="فتح القائمة" aria-expanded={menuOpen}>
@@ -438,7 +438,7 @@ function ArabicHome({ onSwitch, onLogout, isProjectAdmin }: { onSwitch: () => vo
   );
 }
 
-export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: boolean }) {
+export default function Home({ isProjectAdmin = false, hasIndividualAccess = false }: { isProjectAdmin?: boolean; hasIndividualAccess?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isArabic, setIsArabic] = useState(() => new URLSearchParams(window.location.search).get("lang") === "ar");
   const closeMenu = () => setMenuOpen(false);
@@ -446,13 +446,13 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
   const partnerProfile = trpc.partnerAuth.session.useQuery();
   const { logout: logoutProjectAdmin, loading: isProjectLogoutPending } = useAuth();
   const logout = () => {
-    if (isProjectAdmin) {
+    if (isProjectAdmin || hasIndividualAccess) {
       void logoutProjectAdmin();
       return;
     }
     partnerLogout.mutate();
   };
-  const isLogoutPending = isProjectAdmin ? isProjectLogoutPending : partnerLogout.isPending;
+  const isLogoutPending = isProjectAdmin || hasIndividualAccess ? isProjectLogoutPending : partnerLogout.isPending;
 
   useEffect(() => {
     document.documentElement.lang = isArabic ? "ar" : "en";
@@ -460,7 +460,7 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
     return () => { document.documentElement.lang = "en"; document.documentElement.dir = "ltr"; };
   }, [isArabic]);
 
-  if (isArabic) return <ArabicHome onSwitch={() => setIsArabic(false)} onLogout={logout} isProjectAdmin={isProjectAdmin} />;
+  if (isArabic) return <ArabicHome onSwitch={() => setIsArabic(false)} onLogout={logout} isProjectAdmin={isProjectAdmin} hasIndividualAccess={hasIndividualAccess} />;
 
   return (
     <div className="sportix-site">
@@ -476,9 +476,9 @@ export default function Home({ isProjectAdmin = false }: { isProjectAdmin?: bool
             {partnerProfile.data.profileImageUrl ? <img src={partnerProfile.data.profileImageUrl} alt="" /> : <span>{partnerProfile.data.fullName.slice(0, 1).toUpperCase()}</span>}
             <b>{partnerProfile.data.fullName}</b>
           </div>}
-          {isProjectAdmin ? <a className="language-switch partner-profile-link" href="/admin/memberships">CONTROL ROOM</a> : <a className="language-switch partner-profile-link" href="/profile">PROFILE</a>}
+          {isProjectAdmin ? <a className="language-switch partner-profile-link" href="/admin/memberships">CONTROL ROOM</a> : hasIndividualAccess ? <span className="language-switch partner-profile-link">ACCESS ACTIVE</span> : <a className="language-switch partner-profile-link" href="/profile">PROFILE</a>}
           <button className="language-switch" type="button" onClick={() => setIsArabic(true)} aria-label="التبديل إلى العربية">العربية</button>
-          {shouldShowHeaderLogout(isProjectAdmin, Boolean(partnerProfile.data)) && <button className="language-switch" type="button" onClick={logout} disabled={isLogoutPending} aria-label="Log out">{isLogoutPending ? "…" : "LOG OUT"}</button>}
+          {shouldShowHeaderLogout(isProjectAdmin, Boolean(partnerProfile.data), hasIndividualAccess) && <button className="language-switch" type="button" onClick={logout} disabled={isLogoutPending} aria-label="Log out">{isLogoutPending ? "…" : "LOG OUT"}</button>}
           <button
             className="mobile-menu"
             onClick={() => setMenuOpen((open) => !open)}

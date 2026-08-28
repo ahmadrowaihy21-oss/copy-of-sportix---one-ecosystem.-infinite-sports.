@@ -3,7 +3,7 @@ import type { TrpcContext } from "./_core/context";
 import { hashPartnerPassword } from "./partnerAuth";
 
 const db = vi.hoisted(() => ({
-  applyPartnerMembershipDecision: vi.fn(), consumePartnerVerificationRecord: vi.fn(), createPartnerSession: vi.fn(), createPartnerVerificationRecord: vi.fn(), createPendingPartnerAccount: vi.fn(), createContactMessage: vi.fn(), getActivePartnerSession: vi.fn(), getLatestPartnerVerificationRecord: vi.fn(), getPartnerAccountByEmail: vi.fn(), incrementPartnerVerificationAttempts: vi.fn(), listContactMessages: vi.fn(), listPartnerMembershipRequests: vi.fn(), markContactEmailAccepted: vi.fn(), markContactEmailFailed: vi.fn(), markPartnerEmailVerifiedPendingApproval: vi.fn(), refreshPendingPartnerAccount: vi.fn(), revokePartnerSession: vi.fn(), updatePartnerLastLogin: vi.fn(), updatePartnerProfileImage: vi.fn(), updateContactMessageStatus: vi.fn(),
+  applyPartnerMembershipDecision: vi.fn(), applyRegisteredUserAccessDecision: vi.fn(), consumePartnerVerificationRecord: vi.fn(), createPartnerSession: vi.fn(), createPartnerVerificationRecord: vi.fn(), createPendingPartnerAccount: vi.fn(), createContactMessage: vi.fn(), getActivePartnerSession: vi.fn(), getLatestPartnerVerificationRecord: vi.fn(), getPartnerAccountByEmail: vi.fn(), incrementPartnerVerificationAttempts: vi.fn(), listContactMessages: vi.fn(), listPartnerMembershipRequests: vi.fn(), listRegisteredUsers: vi.fn(), markContactEmailAccepted: vi.fn(), markContactEmailFailed: vi.fn(), markPartnerEmailVerifiedPendingApproval: vi.fn(), refreshPendingPartnerAccount: vi.fn(), revokePartnerSession: vi.fn(), updatePartnerLastLogin: vi.fn(), updatePartnerProfileImage: vi.fn(), updateContactMessageStatus: vi.fn(),
 }));
 vi.mock("./db", () => db);
 vi.mock("./partnerEmail", () => ({ sendPartnerVerificationEmail: vi.fn() }));
@@ -40,6 +40,14 @@ describe("SPORTIX Partner membership access", () => {
 
     await expect(administratorCaller().membership.list({ status: "approved" })).resolves.toEqual([]);
     expect(db.listPartnerMembershipRequests).toHaveBeenCalledWith("approved");
+  });
+
+  it("allows only a Manus administrator to manage registered-user access", async () => {
+    db.listRegisteredUsers.mockResolvedValue([]);
+
+    await expect(administratorCaller().userAccess.list({ status: "pending" })).resolves.toEqual([]);
+    await expect(caller().userAccess.list()).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(db.listRegisteredUsers).toHaveBeenCalledWith("pending");
   });
 
   it.each([

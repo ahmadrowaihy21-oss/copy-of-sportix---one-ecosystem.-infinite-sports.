@@ -27,6 +27,8 @@ import {
   requestPartnerMoreInformation,
   updatePartnerProfileImage,
   updateContactMessageStatus,
+  applyRegisteredUserAccessDecision,
+  listRegisteredUsers,
 } from "./db";
 import { createNdaAcceptance, generateNdaEvidence, getNdaAcceptance, getOrCreateNdaDocument, saveCompanyNda, setNdaAuthority } from "./nda";
 import { ENV } from "./_core/env";
@@ -131,6 +133,22 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+  }),
+  userAccess: router({
+    list: adminProcedure
+      .input(z.object({ status: z.enum(["pending", "approved", "rejected", "suspended"]).optional() }).optional())
+      .query(({ input }) => listRegisteredUsers(input?.status)),
+    decide: adminProcedure
+      .input(z.object({ userId: z.number().int().positive(), decision: z.enum(["approve", "reject", "suspend"]) }))
+      .mutation(async ({ input, ctx }) => {
+        const nextStatus = input.decision === "approve" ? "approved" : input.decision === "reject" ? "rejected" : "suspended";
+        try {
+          const result = await applyRegisteredUserAccessDecision({ userId: input.userId, nextStatus, actorUserId: ctx.user.id });
+          return { success: true, ...result } as const;
+        } catch (error) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: error instanceof Error ? error.message : "User access decision could not be applied." });
+        }
+      }),
   }),
   partnerAuth: router({
     session: publicProcedure.query(async ({ ctx }) => {

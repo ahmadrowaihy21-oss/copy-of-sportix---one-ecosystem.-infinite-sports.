@@ -1,5 +1,6 @@
 import { ArrowUpRight, Phone, Volume2, VolumeX } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { startLogin } from "@/const";
 import SportixBrandMark from "../components/SportixBrandMark";
 import "../individual-access.css";
 
@@ -70,7 +71,7 @@ export default function IndividualAccess() {
         <p className="individual-access-kicker">SPORTIX ECOSYSTEM / LIVE ACCESS</p>
         <h1 id="individual-access-title">جاهز للانطلاق؟</h1>
         <p className="individual-access-copy">
-          هذه المساحة مخصصة للحسابات المعتمدة. تواصل مع المؤسس لفتح الوصول، أو اخرج وعاود الدخول بإيميل شركتك.
+          سجّل حسابك الشخصي للانضمام إلى قائمة الانتظار، أو تواصل مع المؤسس لفتح الوصول. ولحسابات الشركات، اخرج وعاود الدخول بإيميل شركتك.
         </p>
 
         <div className="individual-access-actions">
@@ -82,6 +83,13 @@ export default function IndividualAccess() {
             </span>
             <ArrowUpRight size={20} aria-hidden="true" />
           </a>
+          <button type="button" className="individual-access-user-login" onClick={() => startLogin()}>
+            <span>
+              <strong>سجّل أو ادخل بحسابك الشخصي</strong>
+              <small>يظهر طلبك للمسؤول للموافقة</small>
+            </span>
+            <ArrowUpRight size={20} aria-hidden="true" />
+          </button>
           <a className="individual-access-partner-link" href="/partner-access">
             اخرج وعاود الدخول بإيميل شركتك <ArrowUpRight size={16} aria-hidden="true" />
           </a>

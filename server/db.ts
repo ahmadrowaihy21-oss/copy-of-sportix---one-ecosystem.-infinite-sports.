@@ -1,6 +1,7 @@
 import { and, desc, eq, gt, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { contactMessages, InsertContactMessage, InsertPartnerAccount, InsertUser, partnerAccounts, partnerMembershipAudits, partnerSessions, partnerVerificationCodes, users } from "../drizzle/schema";
+import type { RegisteredUserAccessStatus } from "./registeredUserAccess";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -87,6 +88,38 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function listRegisteredUsers(status?: RegisteredUserAccessStatus) {
+  const db = await getDb();
+  if (!db) throw new Error("Registered-user storage is temporarily unavailable");
+
+  const conditions = [eq(users.role, "user")];
+  if (status) conditions.push(eq(users.accessStatus, status));
+  return db.select().from(users).where(and(...conditions)).orderBy(desc(users.createdAt)).limit(250);
+}
+
+export async function applyRegisteredUserAccessDecision(input: {
+  userId: number;
+  nextStatus: Exclude<RegisteredUserAccessStatus, "pending">;
+  actorUserId: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Registered-user storage is temporarily unavailable");
+
+  return db.transaction(async tx => {
+    const rows = await tx.select().from(users).where(eq(users.id, input.userId)).limit(1);
+    const user = rows[0];
+    if (!user || user.role !== "user") throw new Error("Registered user was not found.");
+
+    await tx.update(users).set({
+      accessStatus: input.nextStatus,
+      accessReviewedAt: new Date(),
+      accessReviewedBy: input.actorUserId,
+    }).where(eq(users.id, user.id));
+
+    return { previousStatus: user.accessStatus, nextStatus: input.nextStatus };
+  });
 }
 
 /** Persist a validated public website contact request for future email or CRM delivery. */

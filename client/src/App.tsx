@@ -19,7 +19,8 @@ import MarketplaceCart from "./pages/MarketplaceCart";
 import MarketplaceCheckout from "./pages/MarketplaceCheckout";
 import GoSportix from "./pages/GoSportix";
 import IndividualAccess from "./pages/IndividualAccess";
-import { canBypassPartnerGateway } from "./pages/homeAccess";
+import RegisteredUsers from "./pages/RegisteredUsers";
+import { canBypassPartnerGateway, canEnterApprovedUserSpace } from "./pages/homeAccess";
 import { isAdminPath, isPartnerGatewayPath } from "./pages/individualAccessRoute";
 function Router() {
   const [location] = useLocation();
@@ -27,12 +28,14 @@ function Router() {
   const projectSession = trpc.auth.me.useQuery();
   const utils = trpc.useUtils();
   const isProjectAdmin = canBypassPartnerGateway(projectSession.data?.role);
+  const isApprovedRegisteredUser = canEnterApprovedUserSpace(projectSession.data?.role, projectSession.data?.accessStatus);
 
   if (isAdminPath(location)) {
     if (projectSession.isLoading || !isProjectAdmin) return <IndividualAccess />;
     return <Switch>
       <Route path="/admin/memberships" component={MembershipRequests} />
       <Route path="/admin/inquiries" component={Inquiries} />
+      <Route path="/admin/users" component={RegisteredUsers} />
       <Route component={NotFound} />
     </Switch>;
   }
@@ -42,6 +45,7 @@ function Router() {
   if (isPartnerGatewayPath(location)) return <AuthGateway onAuthenticated={() => utils.partnerAuth.session.invalidate()} />;
   if (projectSession.isLoading || partnerSession.isLoading) return <IndividualAccess />;
   if (isProjectAdmin && location === "/") return <Home isProjectAdmin />;
+  if (isApprovedRegisteredUser && location === "/") return <Home hasIndividualAccess />;
   if (!partnerSession.data) return <IndividualAccess />;
   if (!(["active", "approved"] as const).includes(partnerSession.data.status as "active" | "approved")) return <NdaGate account={partnerSession.data} onChanged={() => utils.partnerAuth.session.invalidate()} />;
 
