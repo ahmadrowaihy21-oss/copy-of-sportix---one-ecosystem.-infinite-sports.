@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canBypassPartnerGateway, canEnterApprovedUserSpace } from "./homeAccess";
+import { canBypassPartnerGateway, canEnterRegisteredUserSpace } from "./homeAccess";
 
 describe("project admin home access", () => {
   it("allows only the confirmed project-admin role to bypass the partner gateway", () => {
@@ -11,10 +11,10 @@ describe("project admin home access", () => {
 });
 
 describe("registered user home access", () => {
-  it("requires an explicit administrator approval for ordinary users", () => {
-    expect(canEnterApprovedUserSpace("user", "approved")).toBe(true);
-    expect(canEnterApprovedUserSpace("user", "pending")).toBe(false);
-    expect(canEnterApprovedUserSpace("user", "rejected")).toBe(false);
-    expect(canEnterApprovedUserSpace("admin", "approved")).toBe(false);
+  it("lets every ordinary Manus user enter without a separate approval page", () => {
+    expect(canEnterRegisteredUserSpace("user")).toBe(true);
+    expect(canEnterRegisteredUserSpace("admin")).toBe(false);
+    expect(canEnterRegisteredUserSpace(null)).toBe(false);
+    expect(canEnterRegisteredUserSpace(undefined)).toBe(false);
   });
 });

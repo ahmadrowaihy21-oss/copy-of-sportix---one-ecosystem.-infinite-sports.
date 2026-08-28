@@ -45,6 +45,7 @@ export function registerOAuthRoutes(app: Express) {
         name: userInfo.name || null,
         email: userInfo.email ?? null,
         loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
+        accessStatus: "approved",
         lastSignedIn: new Date(),
       });
 

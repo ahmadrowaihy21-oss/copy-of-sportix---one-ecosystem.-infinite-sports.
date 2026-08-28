@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { partnerAccounts, users } from "../drizzle/schema.ts";
 import { getDb } from "../server/db.ts";
-import { DEMO_ADMINISTRATOR_NAME, DEMO_APPLICANT_EMAIL, DEMO_INDIVIDUAL_OPEN_ID, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createPendingDemoApplicant, createPendingDemoIndividual } from "../server/demoAccounts.ts";
+import { DEMO_ADMINISTRATOR_NAME, DEMO_APPLICANT_EMAIL, DEMO_INDIVIDUAL_OPEN_ID, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createPendingDemoApplicant, createDemoIndividual } from "../server/demoAccounts.ts";
 import { ENV } from "../server/_core/env.ts";
 import { hashPartnerPassword } from "../server/partnerAuth.ts";
 
@@ -86,7 +86,7 @@ await db
     },
   });
 
-const individual = createPendingDemoIndividual();
+const individual = createDemoIndividual();
 await db
   .insert(users)
   .values(individual)
@@ -96,7 +96,7 @@ await db
       email: individual.email,
       loginMethod: individual.loginMethod,
       role: "user",
-      accessStatus: "pending",
+      accessStatus: "approved",
       accessReviewedAt: null,
       accessReviewedBy: null,
       lastSignedIn: now,
@@ -108,7 +108,7 @@ const [demoPartner] = await db.select({ email: partnerAccounts.email, status: pa
 const [demoApplicant] = await db.select({ email: partnerAccounts.email, status: partnerAccounts.status, emailVerified: partnerAccounts.emailVerified }).from(partnerAccounts).where(eq(partnerAccounts.email, DEMO_APPLICANT_EMAIL)).limit(1);
 const [demoIndividual] = await db.select({ openId: users.openId, accessStatus: users.accessStatus, role: users.role }).from(users).where(eq(users.openId, DEMO_INDIVIDUAL_OPEN_ID)).limit(1);
 
-if (administrator?.role !== "admin" || demoPartner?.status !== "approved" || !demoPartner.emailVerified || demoPartner.accessLevel !== "level_1" || demoApplicant?.status !== "pending_approval" || !demoApplicant.emailVerified || demoIndividual?.role !== "user" || demoIndividual.accessStatus !== "pending") {
+if (administrator?.role !== "admin" || demoPartner?.status !== "approved" || !demoPartner.emailVerified || demoPartner.accessLevel !== "level_1" || demoApplicant?.status !== "pending_approval" || !demoApplicant.emailVerified || demoIndividual?.role !== "user" || demoIndividual?.accessStatus !== "approved") {
   throw new Error("Demo-account verification failed.");
 }
 

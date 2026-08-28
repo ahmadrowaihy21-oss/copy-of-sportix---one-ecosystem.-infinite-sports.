@@ -2,9 +2,8 @@ export function canBypassPartnerGateway(role: "admin" | "user" | null | undefine
   return role === "admin";
 }
 
-export function canEnterApprovedUserSpace(
+export function canEnterRegisteredUserSpace(
   role: "admin" | "user" | null | undefined,
-  accessStatus: "pending" | "approved" | "rejected" | "suspended" | null | undefined,
 ): boolean {
-  return role === "user" && accessStatus === "approved";
+  return role === "user";
 }

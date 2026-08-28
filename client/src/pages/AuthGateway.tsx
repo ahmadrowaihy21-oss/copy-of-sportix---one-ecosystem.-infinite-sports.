@@ -1,13 +1,13 @@
 import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
 import SportixBrandMark from "../components/SportixBrandMark";
-import { ArrowRight, Check, CircleAlert, ImagePlus, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
+import { ArrowRight, CircleAlert, ImagePlus, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
 import React, { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import "../partner-auth.css";
 import "../partner-profile.css";
 
 const logoUrl = "/manus-storage/sportix-ecosystem-approved-logo_e0eb06c5.png";
-type GatewayStep = "landing" | "login" | "signup" | "verify" | "pendingApproval";
+type GatewayStep = "landing" | "login" | "signup" | "verify";
 type ProfileImage = { base64: string; mimeType: "image/jpeg" | "image/png" | "image/webp"; preview: string };
 export const PENDING_VERIFICATION_EMAIL_KEY = "sportix-partners-pending-verification-email";
 
@@ -48,7 +48,7 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
     onError: error => setMessage(getErrorMessage(error, "We could not create your account.")),
   });
   const verifyMutation = trpc.partnerAuth.verifyEmail.useMutation({
-    onSuccess: async () => { window.sessionStorage.removeItem(PENDING_VERIFICATION_EMAIL_KEY); await utils.partnerAuth.session.invalidate(); setMessage(""); setStep("pendingApproval"); },
+    onSuccess: async () => { window.sessionStorage.removeItem(PENDING_VERIFICATION_EMAIL_KEY); await utils.partnerAuth.session.invalidate(); setMessage(""); onAuthenticated(); },
     onError: error => setMessage(getErrorMessage(error, "The verification code could not be accepted.")),
   });
   const resendMutation = trpc.partnerAuth.resendCode.useMutation({
@@ -123,7 +123,6 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
           <button className="partner-primary" disabled={verifyMutation.isPending}>{verifyMutation.isPending ? "VERIFYING…" : <>VERIFY <ArrowRight size={17} /></>}</button>
           <button type="button" className="partner-text-action" disabled={resendMutation.isPending} onClick={() => { setMessage(""); resendMutation.mutate({ email: verificationEmail }); }}>{resendMutation.isPending ? "SENDING…" : "Resend Code"}</button>
         </form>}
-        {step === "pendingApproval" && <div className="partner-gateway-stage partner-verified"><div className="partner-verified-mark"><Check size={30} /></div><p className="partner-gateway-kicker">EMAIL VERIFIED</p><h2>MEMBERSHIP <em>PENDING.</em></h2><p className="partner-gateway-copy">Your profile is complete and awaiting SPORTIX Partners administrator approval. You will be able to log in once your membership is activated.</p><button type="button" className="partner-secondary" onClick={() => selectStep("login")}>BACK TO LOG IN</button></div>}
         {message && <p className="partner-gateway-message" role="alert"><CircleAlert size={15} /> {message}</p>}
       </section>
     </section>

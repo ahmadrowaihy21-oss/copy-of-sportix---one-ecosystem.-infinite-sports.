@@ -9,14 +9,14 @@ export const DEMO_INDIVIDUAL_OPEN_ID = "sportix-individual-access-demo";
 export const DEMO_INDIVIDUAL_EMAIL = "individual.demo@sportix.test";
 export const DEMO_INDIVIDUAL_NAME = "SPORTIX Individual Demo";
 
-export function createPendingDemoIndividual(): InsertUser {
+export function createDemoIndividual(): InsertUser {
   return {
     openId: DEMO_INDIVIDUAL_OPEN_ID,
     name: DEMO_INDIVIDUAL_NAME,
     email: DEMO_INDIVIDUAL_EMAIL,
     loginMethod: "manus",
     role: "user",
-    accessStatus: "pending",
+    accessStatus: "approved",
     lastSignedIn: new Date(),
   };
 }

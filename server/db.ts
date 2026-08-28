@@ -250,10 +250,10 @@ export async function markPartnerEmailVerifiedPendingApproval(accountId: number)
   await db.update(partnerAccounts).set({ status: "pending_approval", emailVerifiedAt: new Date() }).where(eq(partnerAccounts.id, accountId));
 }
 
-export async function markPartnerEmailVerifiedNdaPending(accountId: number) {
+export async function markPartnerEmailVerifiedActive(accountId: number) {
   const db = await getDb();
   if (!db) throw new Error("Partner account storage is temporarily unavailable");
-  await db.update(partnerAccounts).set({ status: "nda_pending", emailVerified: true, emailVerifiedAt: new Date(), verificationMethod: "email_code", verificationStatus: "verified" }).where(eq(partnerAccounts.id, accountId));
+  await db.update(partnerAccounts).set({ status: "active", emailVerified: true, emailVerifiedAt: new Date(), verificationMethod: "email_code", verificationStatus: "verified" }).where(eq(partnerAccounts.id, accountId));
 }
 
 export async function updatePartnerMembershipStatus(accountId: number, status: PartnerMembershipStatus) {

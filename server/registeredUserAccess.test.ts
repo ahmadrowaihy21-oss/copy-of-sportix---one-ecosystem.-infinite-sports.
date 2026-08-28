@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { canEnterRegisteredUserSpace, isRegisteredUserAccessStatus } from "./registeredUserAccess";
 
 describe("registered user access policy", () => {
-  it("only grants the private entry to approved ordinary users", () => {
+  it("grants private entry to every ordinary user regardless of legacy access status", () => {
     expect(canEnterRegisteredUserSpace("user", "approved")).toBe(true);
-    expect(canEnterRegisteredUserSpace("user", "pending")).toBe(false);
-    expect(canEnterRegisteredUserSpace("user", "rejected")).toBe(false);
+    expect(canEnterRegisteredUserSpace("user", "pending")).toBe(true);
+    expect(canEnterRegisteredUserSpace("user", "rejected")).toBe(true);
     expect(canEnterRegisteredUserSpace("admin", "approved")).toBe(false);
   });
 

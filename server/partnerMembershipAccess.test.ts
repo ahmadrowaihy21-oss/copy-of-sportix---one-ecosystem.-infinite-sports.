@@ -51,12 +51,18 @@ describe("SPORTIX Partner membership access", () => {
   });
 
   it.each([
-    ["pending_approval", "Your membership is pending administrator approval."],
     ["rejected", "This membership request was not approved."],
     ["suspended", "This membership is suspended."],
+    ["disabled", "This account is disabled."],
   ] as const)("blocks %s accounts server-side at login", async (status, message) => {
     db.getPartnerAccountByEmail.mockResolvedValue({ id: 22, fullName: "Membership Test", email: "member@example.com", mobileNumber: "+966501234500", passwordHash: await hashPartnerPassword("Membership_Test_Password"), companyName: null, jobTitle: null, status, emailVerifiedAt: new Date(), lastLoginAt: null, createdAt: new Date(), updatedAt: new Date() });
     await expect(caller().partnerAuth.login({ email: "member@example.com", password: "Membership_Test_Password" })).rejects.toMatchObject({ code: "FORBIDDEN", message });
     expect(db.createPartnerSession).not.toHaveBeenCalled();
+  });
+
+  it("allows a verified pending membership to sign in immediately", async () => {
+    db.getPartnerAccountByEmail.mockResolvedValue({ id: 23, fullName: "Immediate Partner", email: "immediate@example.com", mobileNumber: null, passwordHash: await hashPartnerPassword("Membership_Test_Password"), companyName: null, jobTitle: null, status: "pending_approval", emailVerifiedAt: new Date(), lastLoginAt: null, createdAt: new Date(), updatedAt: new Date() });
+    await expect(caller().partnerAuth.login({ email: "immediate@example.com", password: "Membership_Test_Password" })).resolves.toMatchObject({ success: true, account: { status: "pending_approval" } });
+    expect(db.createPartnerSession).toHaveBeenCalled();
   });
 });

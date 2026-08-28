@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { sendSportixContactEmail } from "./resend";
 
 describe("SPORTIX Resend contact delivery", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.resetModules();
     vi.unstubAllGlobals();
   });
 
@@ -14,6 +14,7 @@ describe("SPORTIX Resend contact delivery", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "email_accepted_123" }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
 
+    const { sendSportixContactEmail } = await import("./resend");
     await expect(sendSportixContactEmail({
       contactId: 42,
       fullName: "Ahmad Rowaihy",

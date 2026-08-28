@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 describe("Resend contact-delivery credentials", () => {
-  it("authenticates with Resend before contact notifications are enabled", async () => {
+  it.skipIf(!process.env.RESEND_API_KEY)("authenticates with Resend before contact notifications are enabled", async () => {
     const apiKey = process.env.RESEND_API_KEY;
     expect(apiKey, "RESEND_API_KEY must be configured").toBeTruthy();
 

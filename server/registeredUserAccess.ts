@@ -2,9 +2,9 @@ export type RegisteredUserAccessStatus = "pending" | "approved" | "rejected" | "
 
 export function canEnterRegisteredUserSpace(
   role: "admin" | "user" | null | undefined,
-  accessStatus: RegisteredUserAccessStatus | null | undefined,
+  _accessStatus?: RegisteredUserAccessStatus | null,
 ): boolean {
-  return role === "user" && accessStatus === "approved";
+  return role === "user";
 }
 
 export function isRegisteredUserAccessStatus(value: string): value is RegisteredUserAccessStatus {

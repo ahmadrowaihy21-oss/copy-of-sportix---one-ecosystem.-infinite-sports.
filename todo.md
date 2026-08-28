@@ -126,19 +126,19 @@
 - [x] Add an explicit project-admin sign-in action on the access-restricted Membership Requests state so the owner can establish the required admin session on the preview domain.
 - [x] Restore the missing OAuth users table so the owner’s selected Manus account returns successfully to the protected dashboard.
 - [ ] Make Work Email required while Company Name, Job Title, and Mobile Number are optional; retain mobile as non-verifying profile data only.
-- [ ] Add versioned immutable NDA document, acceptance, authority, evidence, and audit data models with the user-specified legal metadata.
-- [ ] Require verified email → explicit unselected NDA acceptance → company-authority declaration before any membership request reaches admin review.
-- [ ] Implement the non-authorized representative path with secure PDF/JPG/PNG signed-company-NDA upload and a Pending Company NDA Review state.
-- [ ] Generate and store an immutable PDF evidence record for every NDA acceptance, and make it available to the user and administrator.
-- [ ] Extend protected Membership Requests with NDA status/version, authority decision, company document, evidence record, request-more-information, and review actions.
-- [ ] Enforce NDA_PENDING, COMPANY_AUTHORITY_PENDING, COMPANY_NDA_PENDING, PENDING_ADMIN_APPROVAL, APPROVED, REJECTED, and SUSPENDED at frontend, backend, API, and data layers.
+- [x] Canceled by user: Add versioned immutable NDA document, acceptance, authority, evidence, and audit data models with the user-specified legal metadata.
+- [x] Canceled by user: Require verified email → explicit unselected NDA acceptance → company-authority declaration before any membership request reaches admin review.
+- [x] Canceled by user: Implement the non-authorized representative path with secure PDF/JPG/PNG signed-company-NDA upload and a Pending Company NDA Review state.
+- [x] Canceled by user: Generate and store an immutable PDF evidence record for every NDA acceptance, and make it available to the user and administrator.
+- [x] Canceled by user: Extend protected Membership Requests with NDA status/version, authority decision, company document, evidence record, request-more-information, and review actions.
+- [x] Canceled by user: Enforce NDA_PENDING, COMPANY_AUTHORITY_PENDING, COMPANY_NDA_PENDING, PENDING_ADMIN_APPROVAL, APPROVED, REJECTED, and SUSPENDED at frontend, backend, API, and data layers.
 - [ ] Prepare Level 1, Level 2, and Level 3 access-level controls, with Level 3 requiring separate administrator approval.
-- [ ] Test every requested NDA, document, approval, direct-URL/API bypass, audit, and evidence path end-to-end.
-- [ ] Freeze the supplied Arabic NDA verbatim as Version 1.0, Document ID SPORTIX-NDA-AR-2026-001, Effective Date 2026-08-27, and store its computed SHA-256 snapshot.
-- [ ] Remove the public `/marketplace` route so the marketplace cannot bypass the SPORTIX Partners NDA-gated approval workflow.
+- [x] Canceled by user: Test every requested NDA, document, approval, direct-URL/API bypass, audit, and evidence path end-to-end.
+- [x] Canceled by user: Freeze the supplied Arabic NDA verbatim as Version 1.0, Document ID SPORTIX-NDA-AR-2026-001, Effective Date 2026-08-27, and store its computed SHA-256 snapshot.
+- [x] Canceled by user: Remove the public `/marketplace` route so the marketplace cannot bypass the SPORTIX Partners NDA-gated approval workflow.
 - [ ] Register Go SPORTIX, Weekly Legends, and SPORTIX Community as future protected sections with administrator-configurable Level 1–3 access requirements; do not build their content yet.
 - [ ] Register SPORT ID as a future protected section with administrator-configurable Level 1–3 access requirements; do not build its content yet.
-- [ ] Merge the newest GO SPORTIX code behind the NDA-gated approved-membership route guard, including its booking, cart, and checkout routes.
+- [x] Canceled by user: Merge the newest GO SPORTIX code behind the NDA-gated approved-membership route guard, including its booking, cart, and checkout routes.
 - [x] إنشاء حسابَي اختبار منفصلين لمسؤول وشريك عادي والتحقق من بوابات الدخول وحدود الصلاحيات.
 - [x] التحقق من دخول مالك المشروع عبر Manus بوصفه SPORTIX Super Admin ومن الوصول إلى لوحة الإدارة وإجراءات العضويات دون تغيير النموذج العام.
 - [x] إصلاح مرشح Active في Control Room ليعرض الحسابات Approved التي تملك وصولاً فعّالاً، ثم إعادة اختبار دورة الموافقة والرفض للحساب التجريبي.
@@ -162,3 +162,13 @@
 - [x] ربط المستخدم المسجل غير المعتمد بصفحة الوصول الفضائية وربط المستخدم المعتمد بصفحته الخاصة مع اختبار حدود الصلاحيات.
 - [x] إضافة مدخل تسجيل أو دخول الأفراد عبر Manus من صفحة الوصول كي تظهر حساباتهم بحالة انتظار في لوحة المسؤول.
 - [x] إعداد وعرض اختبار عملي معزول لمستخدم تجريبي ينتقل من Pending approval إلى Approved ثم يعود إلى Pending approval.
+- [x] إلغاء متطلب NDA من تدفق التسجيل والوصول
+- [x] جعل المستخدم المسجل يحصل على الوصول مباشرة بعد نجاح التسجيل/تسجيل الدخول
+- [x] إزالة صفحة User Access ومدخلها من Control Room دون التأثير على Memberships
+- [x] تحديث اختبارات الصلاحيات والتسجيل لتطابق الوصول الفوري
+- [x] التحقق بصرياً من بوابة الوصول ولوحة المسؤول، ثم تشغيل TypeScript والاختبارات والبناء
+- [x] حفظ نسخة checkpoint منشورة بعد اكتمال التعديلات
+- [x] تحديث نصوص Individual Access لتؤكد الدخول الفوري للمستخدم الشخصي بعد تسجيل Manus
+- [x] مواءمة seed/access helpers القديمة للمستخدمين العاديين مع سياسة الدخول الفوري
+- [x] توثيق الاختبارات الخارجية التي تعتمد على أسرار Resend أو فصلها عن اختبار الوصول
+- [x] إعادة تشغيل التحقق النهائي بعد معالجة الفجوات وعدم تعليم المهمة قبل نجاحه

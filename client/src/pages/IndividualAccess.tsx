@@ -71,7 +71,7 @@ export default function IndividualAccess() {
         <p className="individual-access-kicker">SPORTIX ECOSYSTEM / LIVE ACCESS</p>
         <h1 id="individual-access-title">جاهز للانطلاق؟</h1>
         <p className="individual-access-copy">
-          سجّل حسابك الشخصي للانضمام إلى قائمة الانتظار، أو تواصل مع المؤسس لفتح الوصول. ولحسابات الشركات، اخرج وعاود الدخول بإيميل شركتك.
+          سجّل أو ادخل بحسابك الشخصي عبر Manus للوصول مباشرة إلى SPORTIX، أو تواصل مع المؤسس إذا كنت تدخل ممثلاً لشركة. ولحسابات الشركات، اخرج وعاود الدخول بإيميل شركتك.
         </p>
 
         <div className="individual-access-actions">
@@ -86,7 +86,7 @@ export default function IndividualAccess() {
           <button type="button" className="individual-access-user-login" onClick={() => startLogin()}>
             <span>
               <strong>سجّل أو ادخل بحسابك الشخصي</strong>
-              <small>يظهر طلبك للمسؤول للموافقة</small>
+              <small>دخول مباشر بعد تسجيل Manus</small>
             </span>
             <ArrowUpRight size={20} aria-hidden="true" />
           </button>

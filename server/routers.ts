@@ -20,17 +20,14 @@ import {
   markContactEmailFailed,
   refreshPendingPartnerAccount,
   revokePartnerSession,
-  markPartnerEmailVerifiedPendingApproval,
-  markPartnerEmailVerifiedNdaPending,
   updatePartnerLastLogin,
-  updatePartnerMembershipStatus,
   requestPartnerMoreInformation,
+  markPartnerEmailVerifiedActive,
   updatePartnerProfileImage,
   updateContactMessageStatus,
   applyRegisteredUserAccessDecision,
   listRegisteredUsers,
 } from "./db";
-import { createNdaAcceptance, generateNdaEvidence, getNdaAcceptance, getOrCreateNdaDocument, saveCompanyNda, setNdaAuthority } from "./nda";
 import { ENV } from "./_core/env";
 import { MAX_VERIFICATION_ATTEMPTS, PARTNER_SESSION_COOKIE, PARTNER_SESSION_TTL_MS, PARTNER_VERIFICATION_TTL_MS, createPartnerSessionToken, createPartnerVerificationCode, hashPartnerSessionToken, hashPartnerVerificationCode, hashPartnerPassword, normalizePartnerEmail, verifyPartnerPassword } from "./partnerAuth";
 import { sendPartnerVerificationEmail } from "./partnerEmail";
@@ -205,16 +202,17 @@ export const appRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST", message: "The verification code is incorrect." });
       }
       if (!await consumePartnerVerificationRecord(record.id)) throw new TRPCError({ code: "BAD_REQUEST", message: "This verification code has already been used." });
-      await markPartnerEmailVerifiedNdaPending(account.id);
+      await markPartnerEmailVerifiedActive(account.id);
       await issuePartnerSession(account.id, ctx);
-      return { success: true, account: publicPartnerAccount({ ...account, status: "nda_pending" }) } as const;
+      return { success: true, account: publicPartnerAccount({ ...account, status: "active" }) } as const;
     }),
     login: publicProcedure.input(partnerLoginInput).mutation(async ({ input, ctx }) => {
       const account = await getPartnerAccountByEmail(normalizePartnerEmail(input.email));
       const valid = account ? await verifyPartnerPassword(input.password, account.passwordHash) : false;
       if (!account || !valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Email or password is incorrect." });
-      if (account.status !== "approved") {
-        const message = ["pending_approval", "pending_admin_approval"].includes(account.status) ? "Your membership is pending administrator approval." : account.status === "company_nda_pending" ? "Upload the signed Company NDA to continue." : account.status === "company_authority_pending" ? "Complete the company authority declaration to continue." : account.status === "nda_pending" ? "Accept the SPORTIX NDA to continue." : account.status === "rejected" ? "This membership request was not approved." : account.status === "suspended" ? "This membership is suspended." : "Verify your email before logging in.";
+      const blockedStatuses = ["email_unverified", "rejected", "suspended", "disabled"] as const;
+      if (blockedStatuses.includes(account.status as typeof blockedStatuses[number])) {
+        const message = account.status === "rejected" ? "This membership request was not approved." : account.status === "suspended" ? "This membership is suspended." : account.status === "disabled" ? "This account is disabled." : "Verify your email before logging in.";
         throw new TRPCError({ code: "FORBIDDEN", message });
       }
       await updatePartnerLastLogin(account.id);
@@ -227,52 +225,6 @@ export const appRouter = router({
       ctx.res.clearCookie(PARTNER_SESSION_COOKIE, { ...getSessionCookieOptions(ctx.req), maxAge: -1 });
       return { success: true } as const;
     }),
-    acceptNda: publicProcedure.input(z.object({ agree: z.literal(true) })).mutation(async ({ ctx }) => {
-      const token = readPartnerSessionToken(ctx.req.headers.cookie);
-      const session = token && await getActivePartnerSession(hashPartnerSessionToken(token));
-      if (!session || session.account.status !== "nda_pending") throw new TRPCError({ code: "FORBIDDEN", message: "Verify your email before accepting the NDA." });
-      const acceptance = await createNdaAcceptance({ accountId: session.account.id, requestIp: getClientIp(ctx.req.headers["x-forwarded-for"], ctx.req.socket.remoteAddress), userAgent: ctx.req.headers["user-agent"] || "", emailVerifiedAt: session.account.emailVerifiedAt });
-      await generateNdaEvidence({ accountId: session.account.id, acceptanceId: acceptance.id });
-      await updatePartnerMembershipStatus(session.account.id, "company_authority_pending");
-      return { success: true, acceptanceId: acceptance.acceptanceId } as const;
-    }),
-    declareCompanyAuthority: publicProcedure.input(z.object({ authority: z.enum(["yes", "no"]) })).mutation(async ({ input, ctx }) => {
-      const token = readPartnerSessionToken(ctx.req.headers.cookie);
-      const session = token && await getActivePartnerSession(hashPartnerSessionToken(token));
-      if (!session || session.account.status !== "company_authority_pending") throw new TRPCError({ code: "FORBIDDEN", message: "Accept the NDA before declaring company authority." });
-      const acceptance = await getNdaAcceptance(session.account.id);
-      if (!acceptance) throw new TRPCError({ code: "BAD_REQUEST", message: "The NDA acceptance record was not found." });
-      const ip = getClientIp(ctx.req.headers["x-forwarded-for"], ctx.req.socket.remoteAddress);
-      const userAgent = ctx.req.headers["user-agent"] || "";
-      await setNdaAuthority({ acceptanceId: acceptance.id, accountId: session.account.id, authority: input.authority, requestIp: ip, userAgent });
-      const status = input.authority === "yes" ? "pending_admin_approval" : "company_nda_pending";
-      await updatePartnerMembershipStatus(session.account.id, status);
-      return { success: true, status } as const;
-    }),
-    uploadCompanyNda: publicProcedure.input(z.object({ base64: z.string().min(4).max(11_000_000), mimeType: z.enum(["application/pdf", "image/jpeg", "image/png"]) })).mutation(async ({ input, ctx }) => {
-      const token = readPartnerSessionToken(ctx.req.headers.cookie);
-      const session = token && await getActivePartnerSession(hashPartnerSessionToken(token));
-      if (!session || session.account.status !== "company_nda_pending") throw new TRPCError({ code: "FORBIDDEN", message: "A signed Company NDA is not currently required for this account." });
-      const acceptance = await getNdaAcceptance(session.account.id);
-      if (!acceptance) throw new TRPCError({ code: "BAD_REQUEST", message: "The NDA acceptance record was not found." });
-      const stored = await saveCompanyNda({ acceptanceId: acceptance.id, accountId: session.account.id, file: input, requestIp: getClientIp(ctx.req.headers["x-forwarded-for"], ctx.req.socket.remoteAddress), userAgent: ctx.req.headers["user-agent"] || "" });
-      await updatePartnerMembershipStatus(session.account.id, "pending_admin_approval");
-      return { success: true, url: stored.url } as const;
-    }),
-    ndaEvidence: publicProcedure.query(async ({ ctx }) => {
-      const token = readPartnerSessionToken(ctx.req.headers.cookie);
-      const session = token && await getActivePartnerSession(hashPartnerSessionToken(token));
-      if (!session) throw new TRPCError({ code: "UNAUTHORIZED", message: "Sign in to view your NDA evidence." });
-      const acceptance = await getNdaAcceptance(session.account.id);
-      return acceptance ? { acceptanceId: acceptance.acceptanceId, evidenceUrl: acceptance.evidenceStorageUrl, authority: acceptance.authorityAnswer, companyNdaUrl: acceptance.companyNdaStorageUrl } : null;
-    }),
-    ndaDocument: publicProcedure.query(async ({ ctx }) => {
-      const token = readPartnerSessionToken(ctx.req.headers.cookie);
-      const session = token && await getActivePartnerSession(hashPartnerSessionToken(token));
-      if (!session || !session.account.emailVerifiedAt) throw new TRPCError({ code: "FORBIDDEN", message: "Verify your email before viewing the NDA." });
-      const nda = await getOrCreateNdaDocument();
-      return { version: nda.version, documentId: nda.documentId, effectiveDate: nda.effectiveDate, jurisdiction: nda.jurisdiction, controllingLanguage: nda.controllingLanguage, agreedCompensation: nda.agreedCompensation, content: nda.contentSnapshot, hash: nda.contentHash };
-    }),
   }),
   membership: router({
     list: adminProcedure.input(z.object({ status: z.enum(["pending", "active", "disabled", "email_unverified", "nda_pending", "company_authority_pending", "company_nda_pending", "pending_approval", "pending_admin_approval", "approved", "rejected", "suspended"]).optional() }).optional()).query(({ input }) => listPartnerMembershipRequests(input?.status)),
@@ -284,10 +236,6 @@ export const appRouter = router({
       } catch (error) {
         throw new TRPCError({ code: "BAD_REQUEST", message: error instanceof Error ? error.message : "Membership decision could not be applied." });
       }
-    }),
-    ndaDetail: adminProcedure.input(z.object({ accountId: z.number().int().positive() })).query(async ({ input }) => {
-      const acceptance = await getNdaAcceptance(input.accountId);
-      return acceptance ? { acceptanceId: acceptance.acceptanceId, authority: acceptance.authorityAnswer, acceptedAt: acceptance.acceptedAt, evidenceUrl: acceptance.evidenceStorageUrl, companyNdaUrl: acceptance.companyNdaStorageUrl, companyNdaMimeType: acceptance.companyNdaMimeType, adminStatus: acceptance.adminStatus, ndaDocumentId: acceptance.ndaDocumentId } : null;
     }),
     requestMoreInformation: adminProcedure.input(z.object({ accountId: z.number().int().positive(), note: z.string().trim().min(4).max(2_000) })).mutation(async ({ input, ctx }) => {
       await requestPartnerMoreInformation(input.accountId, input.note);
