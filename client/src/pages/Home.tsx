@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 
 const heroImage = "/manus-storage/sportix-runner-cinematic_f1ab034b.jpg";
-const loopFilmUrl = "/manus-storage/sportix-master-film-continuous-audio_8e66c45f.mp4";
+export const loopFilmUrl = "/manus-storage/SPORTIX_Strategic_Vision_Film_Audio_Corrected_1_b02780c3.mp4";
 
 type HeaderNavigationItem = { href: string; label: string };
 
