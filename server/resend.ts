@@ -23,6 +23,16 @@ const escapeHtml = (value: string) =>
 
 const cleanSubject = (subject: string) => subject.replace(/\s+/g, " ").trim();
 
+const mailboxPattern = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+const formattedMailboxPattern = /^[^<>]+<[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+>$/;
+
+function normalizeContactSender(value: string) {
+  const sender = value.trim();
+  if (mailboxPattern.test(sender)) return `SPORTIX Contact <${sender}>`;
+  if (formattedMailboxPattern.test(sender)) return sender;
+  throw new Error("SPORTIX contact sender is invalid. Use name@domain.com or SPORTIX <name@domain.com>");
+}
+
 const emailRow = (label: string, value: string) => `
   <tr>
     <td style="padding: 0 0 14px;">
@@ -116,10 +126,11 @@ export async function sendSportixContactEmail(payload: ContactEmailPayload): Pro
   if (!apiKey || !from || !recipient) {
     throw new Error("SPORTIX contact email is not configured");
   }
+  const sender = normalizeContactSender(from);
 
   const emailContent = buildSportixContactEmail(payload);
   const body = {
-    from: `SPORTIX Contact <${from}>`,
+    from: sender,
     to: [recipient],
     reply_to: payload.contactEmail,
     subject: `[SPORTIX inquiry] ${emailContent.normalizedSubject}`,
