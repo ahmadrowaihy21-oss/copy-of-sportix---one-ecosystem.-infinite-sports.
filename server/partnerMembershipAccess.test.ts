@@ -3,7 +3,7 @@ import type { TrpcContext } from "./_core/context";
 import { hashPartnerPassword } from "./partnerAuth";
 
 const db = vi.hoisted(() => ({
-  applyPartnerMembershipDecision: vi.fn(), applyRegisteredUserAccessDecision: vi.fn(), consumePartnerVerificationRecord: vi.fn(), createPartnerSession: vi.fn(), createPartnerVerificationRecord: vi.fn(), createPendingPartnerAccount: vi.fn(), createContactMessage: vi.fn(), getActivePartnerSession: vi.fn(), getLatestPartnerVerificationRecord: vi.fn(), getPartnerAccountByEmail: vi.fn(), incrementPartnerVerificationAttempts: vi.fn(), listContactMessages: vi.fn(), listPartnerMembershipRequests: vi.fn(), listRegisteredUsers: vi.fn(), markContactEmailAccepted: vi.fn(), markContactEmailFailed: vi.fn(), markPartnerEmailVerifiedPendingApproval: vi.fn(), refreshPendingPartnerAccount: vi.fn(), revokePartnerSession: vi.fn(), updatePartnerLastLogin: vi.fn(), updatePartnerProfileImage: vi.fn(), updateContactMessageStatus: vi.fn(),
+  applyPartnerMembershipDecision: vi.fn(), applyRegisteredUserAccessDecision: vi.fn(), consumePartnerVerificationRecord: vi.fn(), createPartnerSession: vi.fn(), createPartnerVerificationRecord: vi.fn(), createPendingPartnerAccount: vi.fn(), createContactMessage: vi.fn(), getActivePartnerSession: vi.fn(), getLatestPartnerVerificationRecord: vi.fn(), getPartnerAccountByEmail: vi.fn(), incrementPartnerVerificationAttempts: vi.fn(), listContactMessages: vi.fn(), listPartnerMembershipRequests: vi.fn(), listRegisteredUsers: vi.fn(), markContactEmailAccepted: vi.fn(), markContactEmailFailed: vi.fn(), markPartnerEmailVerifiedActive: vi.fn(), refreshPendingPartnerAccount: vi.fn(), revokePartnerSession: vi.fn(), updatePartnerLastLogin: vi.fn(), updatePartnerProfileImage: vi.fn(), updateContactMessageStatus: vi.fn(),
 }));
 vi.mock("./db", () => db);
 vi.mock("./partnerEmail", () => ({ sendPartnerVerificationEmail: vi.fn() }));
@@ -60,9 +60,9 @@ describe("SPORTIX Partner membership access", () => {
     expect(db.createPartnerSession).not.toHaveBeenCalled();
   });
 
-  it("allows a verified pending membership to sign in immediately", async () => {
-    db.getPartnerAccountByEmail.mockResolvedValue({ id: 23, fullName: "Immediate Partner", email: "immediate@example.com", mobileNumber: null, passwordHash: await hashPartnerPassword("Membership_Test_Password"), companyName: null, jobTitle: null, status: "pending_approval", emailVerifiedAt: new Date(), lastLoginAt: null, createdAt: new Date(), updatedAt: new Date() });
-    await expect(caller().partnerAuth.login({ email: "immediate@example.com", password: "Membership_Test_Password" })).resolves.toMatchObject({ success: true, account: { status: "pending_approval" } });
+  it("allows a verified membership to sign in immediately", async () => {
+    db.getPartnerAccountByEmail.mockResolvedValue({ id: 23, fullName: "Immediate Partner", email: "immediate@example.com", mobileNumber: "+966501234501", passwordHash: await hashPartnerPassword("Membership_Test_Password"), companyName: null, jobTitle: null, status: "active", emailVerifiedAt: new Date(), lastLoginAt: null, createdAt: new Date(), updatedAt: new Date() });
+    await expect(caller().partnerAuth.login({ email: "immediate@example.com", password: "Membership_Test_Password" })).resolves.toMatchObject({ success: true, account: { status: "active" } });
     expect(db.createPartnerSession).toHaveBeenCalled();
   });
 });

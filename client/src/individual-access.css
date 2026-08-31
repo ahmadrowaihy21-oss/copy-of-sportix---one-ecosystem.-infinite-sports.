@@ -215,6 +215,7 @@
   background: rgba(3, 5, 2, .66);
   font: inherit;
   text-align: right;
+  text-decoration: none;
   cursor: pointer;
   transition: transform 160ms cubic-bezier(.23, 1, .32, 1), background-color 160ms ease, border-color 160ms ease;
 }

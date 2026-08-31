@@ -16,7 +16,7 @@ const db = vi.hoisted(() => ({
   listPartnerMembershipRequests: vi.fn(),
   markContactEmailAccepted: vi.fn(),
   markContactEmailFailed: vi.fn(),
-  markPartnerEmailVerifiedPendingApproval: vi.fn(),
+  markPartnerEmailVerifiedActive: vi.fn(),
   refreshPendingPartnerAccount: vi.fn(),
   revokePartnerSession: vi.fn(),
   updatePartnerLastLogin: vi.fn(),
@@ -46,7 +46,7 @@ describe("SPORTIX membership administration", () => {
   });
 
   it("records a protected approval decision with the authenticated administrator", async () => {
-    db.applyPartnerMembershipDecision.mockResolvedValue({ previousStatus: "pending_admin_approval", nextStatus: "approved" });
+    db.applyPartnerMembershipDecision.mockResolvedValue({ previousStatus: "active", nextStatus: "approved" });
     await expect(caller("admin").membership.decide({ accountId: 17, decision: "approve", note: "Verified partner profile." })).resolves.toMatchObject({ success: true, nextStatus: "approved" });
     expect(db.applyPartnerMembershipDecision).toHaveBeenCalledWith({ accountId: 17, nextStatus: "approved", actorUserId: 41, note: "Verified partner profile." });
   });

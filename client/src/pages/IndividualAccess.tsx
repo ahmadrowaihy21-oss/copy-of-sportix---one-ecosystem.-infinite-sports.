@@ -1,6 +1,5 @@
 import { ArrowUpRight, Phone, Volume2, VolumeX } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { startLogin } from "@/const";
 import SportixBrandMark from "../components/SportixBrandMark";
 import "../individual-access.css";
 
@@ -71,10 +70,17 @@ export default function IndividualAccess() {
         <p className="individual-access-kicker">SPORTIX ECOSYSTEM / LIVE ACCESS</p>
         <h1 id="individual-access-title">جاهز للانطلاق؟</h1>
         <p className="individual-access-copy">
-          سجّل أو ادخل بحسابك الشخصي عبر Manus للوصول مباشرة إلى SPORTIX، أو تواصل مع المؤسس إذا كنت تدخل ممثلاً لشركة. ولحسابات الشركات، اخرج وعاود الدخول بإيميل شركتك.
+          للدخول إلى SPORTIX، اضغط هنا للانتقال إلى بوابة الدخول. من البوابة يمكنك تسجيل الدخول أو إنشاء مستخدم جديد، مع توثيق البريد الإلكتروني عبر رمز OTP.
         </p>
 
         <div className="individual-access-actions">
+          <a className="individual-access-user-login" href="/partner-access">
+            <span>
+              <strong>للدخول إلى بوابة SPORTIX اضغط هنا</strong>
+              <small>تسجيل الدخول أو تسجيل مستخدم جديد</small>
+            </span>
+            <ArrowUpRight size={20} aria-hidden="true" />
+          </a>
           <a className="individual-access-contact" href={`tel:${founderPhone}`}>
             <span className="individual-access-contact-icon"><Phone size={22} /></span>
             <span>
@@ -83,15 +89,8 @@ export default function IndividualAccess() {
             </span>
             <ArrowUpRight size={20} aria-hidden="true" />
           </a>
-          <button type="button" className="individual-access-user-login" onClick={() => startLogin()}>
-            <span>
-              <strong>سجّل أو ادخل بحسابك الشخصي</strong>
-              <small>دخول مباشر بعد تسجيل Manus</small>
-            </span>
-            <ArrowUpRight size={20} aria-hidden="true" />
-          </button>
           <a className="individual-access-partner-link" href="/partner-access">
-            اخرج وعاود الدخول بإيميل شركتك <ArrowUpRight size={16} aria-hidden="true" />
+            فتح بوابة تسجيل الشركات <ArrowUpRight size={16} aria-hidden="true" />
           </a>
         </div>
       </section>

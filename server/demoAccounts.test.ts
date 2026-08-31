@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_APPLICANT_EMAIL, DEMO_INDIVIDUAL_EMAIL, DEMO_INDIVIDUAL_OPEN_ID, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createPendingDemoApplicant, createDemoIndividual } from "./demoAccounts";
+import { DEMO_APPLICANT_EMAIL, DEMO_INDIVIDUAL_EMAIL, DEMO_INDIVIDUAL_OPEN_ID, DEMO_PARTNER_EMAIL, createApprovedDemoPartner, createDemoApplicant, createDemoIndividual } from "./demoAccounts";
 
 describe("demo account seed data", () => {
   it("creates an email-verified approved partner with basic access", () => {
@@ -15,12 +15,12 @@ describe("demo account seed data", () => {
     });
   });
 
-  it("creates an email-verified request that can be reviewed by an administrator", () => {
-    const account = createPendingDemoApplicant("scrypt$test$hash");
+  it("creates an email-verified partner with immediate access", () => {
+    const account = createDemoApplicant("scrypt$test$hash");
 
     expect(account).toMatchObject({
       email: DEMO_APPLICANT_EMAIL,
-      status: "pending_approval",
+      status: "active",
       emailVerified: true,
       verificationStatus: "verified",
       accessLevel: "level_1",

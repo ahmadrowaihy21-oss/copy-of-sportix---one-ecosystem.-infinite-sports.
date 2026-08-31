@@ -13,6 +13,8 @@ vi.mock("@/lib/trpc", () => ({
       signUp: { useMutation: () => ({ isPending: false, mutate: vi.fn() }) },
       verifyEmail: { useMutation: () => ({ isPending: false, mutate: vi.fn() }) },
       resendCode: { useMutation: () => ({ isPending: false, mutate: vi.fn() }) },
+      requestPasswordReset: { useMutation: () => ({ isPending: false, mutate: vi.fn() }) },
+      resetPassword: { useMutation: () => ({ isPending: false, mutate: vi.fn() }) },
     },
   },
 }));

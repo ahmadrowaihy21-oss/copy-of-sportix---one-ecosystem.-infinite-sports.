@@ -60,7 +60,7 @@ export const partnerAccounts = mysqlTable("partner_accounts", {
   id: int("id").autoincrement().primaryKey(),
   fullName: varchar("fullName", { length: 160 }).notNull(),
   email: varchar("email", { length: 320 }).notNull().unique(),
-  mobileNumber: varchar("mobileNumber", { length: 32 }),
+  mobileNumber: varchar("mobileNumber", { length: 32 }).notNull(),
   passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
   companyName: varchar("companyName", { length: 200 }),
   jobTitle: varchar("jobTitle", { length: 160 }),
@@ -73,7 +73,7 @@ export const partnerAccounts = mysqlTable("partner_accounts", {
   sportsSolutionIdea: text("sportsSolutionIdea"),
   profileImageKey: varchar("profileImageKey", { length: 512 }),
   profileImageUrl: varchar("profileImageUrl", { length: 700 }),
-  status: mysqlEnum("status", ["pending", "active", "disabled", "email_unverified", "nda_pending", "company_authority_pending", "company_nda_pending", "pending_approval", "pending_admin_approval", "approved", "rejected", "suspended"]).default("email_unverified").notNull(),
+  status: mysqlEnum("status", ["active", "disabled", "email_unverified", "approved", "rejected", "suspended"]).default("email_unverified").notNull(),
   emailVerified: boolean("emailVerified").default(false).notNull(),
   emailVerifiedAt: timestamp("emailVerifiedAt"),
   verificationMethod: varchar("verificationMethod", { length: 32 }),
@@ -120,60 +120,16 @@ export const partnerMembershipAudits = mysqlTable("partner_membership_audits", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
-/** Immutable approved NDA versions. A version's snapshot and SHA-256 hash are frozen once it is used. */
-export const ndaDocuments = mysqlTable("nda_documents", {
+/** Password-reset OTP records. Only digests are stored; codes are short-lived and single-use. */
+export const partnerPasswordResetCodes = mysqlTable("partner_password_reset_codes", {
   id: int("id").autoincrement().primaryKey(),
-  version: varchar("version", { length: 32 }).notNull().unique(),
-  documentId: varchar("documentId", { length: 96 }).notNull().unique(),
-  effectiveDate: varchar("effectiveDate", { length: 16 }).notNull(),
-  jurisdiction: varchar("jurisdiction", { length: 160 }).notNull(),
-  controllingLanguage: varchar("controllingLanguage", { length: 32 }).notNull(),
-  agreedCompensation: varchar("agreedCompensation", { length: 64 }).notNull(),
-  contentSnapshot: text("contentSnapshot").notNull(),
-  contentHash: varchar("contentHash", { length: 64 }).notNull(),
-  sourceStorageKey: varchar("sourceStorageKey", { length: 512 }).notNull(),
-  sourceStorageUrl: varchar("sourceStorageUrl", { length: 700 }).notNull(),
-  immutableLockedAt: timestamp("immutableLockedAt").defaultNow().notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-/** Permanent evidence of a specific user accepting a specific immutable NDA version. */
-export const ndaAcceptances = mysqlTable("nda_acceptances", {
-  id: int("id").autoincrement().primaryKey(),
-  acceptanceId: varchar("acceptanceId", { length: 96 }).notNull().unique(),
   accountId: int("accountId").notNull(),
-  ndaDocumentId: int("ndaDocumentId").notNull(),
-  acceptanceStatus: mysqlEnum("acceptanceStatus", ["accepted"]).default("accepted").notNull(),
-  acceptedAt: timestamp("acceptedAt").defaultNow().notNull(),
+  codeHash: varchar("codeHash", { length: 64 }).notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  attempts: int("attempts").default(0).notNull(),
   requestIp: varchar("requestIp", { length: 64 }),
-  userAgent: varchar("userAgent", { length: 800 }),
-  browser: varchar("browser", { length: 160 }),
-  deviceInfo: varchar("deviceInfo", { length: 240 }),
-  emailVerificationStatus: varchar("emailVerificationStatus", { length: 32 }).notNull(),
-  emailVerifiedAt: timestamp("emailVerifiedAt"),
-  authorityAnswer: mysqlEnum("authorityAnswer", ["yes", "no"]),
-  authorityDeclaredAt: timestamp("authorityDeclaredAt"),
-  companyNdaStorageKey: varchar("companyNdaStorageKey", { length: 512 }),
-  companyNdaStorageUrl: varchar("companyNdaStorageUrl", { length: 700 }),
-  companyNdaMimeType: varchar("companyNdaMimeType", { length: 96 }),
-  evidenceStorageKey: varchar("evidenceStorageKey", { length: 512 }),
-  evidenceStorageUrl: varchar("evidenceStorageUrl", { length: 700 }),
-  evidenceHash: varchar("evidenceHash", { length: 64 }),
-  adminStatus: varchar("adminStatus", { length: 32 }).notNull(),
-  adminReviewerUserId: int("adminReviewerUserId"),
-  adminReviewedAt: timestamp("adminReviewedAt"),
-});
-
-/** Append-only legal and security event record. Ordinary partner routes never expose write or update operations. */
-export const partnerAuditLogs = mysqlTable("partner_audit_logs", {
-  id: int("id").autoincrement().primaryKey(),
-  accountId: int("accountId"),
-  actorUserId: int("actorUserId"),
-  action: varchar("action", { length: 64 }).notNull(),
-  requestIp: varchar("requestIp", { length: 64 }),
-  userAgent: varchar("userAgent", { length: 800 }),
-  relatedRecordId: varchar("relatedRecordId", { length: 96 }),
-  metadata: text("metadata"),
+  resendEmailId: varchar("resendEmailId", { length: 128 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

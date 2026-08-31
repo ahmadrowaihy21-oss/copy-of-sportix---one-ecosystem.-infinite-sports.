@@ -6,8 +6,10 @@ const scrypt = promisify(scryptCallback);
 
 export const PARTNER_SESSION_COOKIE = "__Host-sportix_partner_session";
 export const PARTNER_VERIFICATION_TTL_MS = 10 * 60 * 1_000;
+export const PARTNER_PASSWORD_RESET_TTL_MS = 10 * 60 * 1_000;
 export const PARTNER_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1_000;
 export const MAX_VERIFICATION_ATTEMPTS = 5;
+export const MAX_PASSWORD_RESET_ATTEMPTS = 5;
 
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
 
@@ -32,6 +34,10 @@ export function createPartnerVerificationCode() {
 
 export function hashPartnerVerificationCode(accountId: number, code: string) {
   return digest(`partner-verification:${accountId}:${code}:${ENV.cookieSecret}`);
+}
+
+export function hashPartnerPasswordResetCode(accountId: number, code: string) {
+  return digest(`partner-password-reset:${accountId}:${code}:${ENV.cookieSecret}`);
 }
 
 export function createPartnerSessionToken() {

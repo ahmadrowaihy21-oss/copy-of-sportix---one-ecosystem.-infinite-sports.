@@ -1,6 +1,6 @@
 import { and, desc, eq, gt, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { contactMessages, InsertContactMessage, InsertPartnerAccount, InsertUser, partnerAccounts, partnerMembershipAudits, partnerSessions, partnerVerificationCodes, users } from "../drizzle/schema";
+import { contactMessages, InsertContactMessage, InsertPartnerAccount, InsertUser, partnerAccounts, partnerMembershipAudits, partnerPasswordResetCodes, partnerSessions, partnerVerificationCodes, users } from "../drizzle/schema";
 import type { RegisteredUserAccessStatus } from "./registeredUserAccess";
 import { ENV } from './_core/env';
 
@@ -244,12 +244,6 @@ export async function consumePartnerVerificationRecord(verificationId: number) {
   return Number(result[0].affectedRows) === 1;
 }
 
-export async function markPartnerEmailVerifiedPendingApproval(accountId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Partner account storage is temporarily unavailable");
-  await db.update(partnerAccounts).set({ status: "pending_approval", emailVerifiedAt: new Date() }).where(eq(partnerAccounts.id, accountId));
-}
-
 export async function markPartnerEmailVerifiedActive(accountId: number) {
   const db = await getDb();
   if (!db) throw new Error("Partner account storage is temporarily unavailable");
@@ -262,13 +256,7 @@ export async function updatePartnerMembershipStatus(accountId: number, status: P
   await db.update(partnerAccounts).set({ status }).where(eq(partnerAccounts.id, accountId));
 }
 
-export async function requestPartnerMoreInformation(accountId: number, note: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Partner account storage is temporarily unavailable");
-  await db.update(partnerAccounts).set({ status: "pending_admin_approval", moreInformationRequest: note.slice(0, 2_000) }).where(eq(partnerAccounts.id, accountId));
-}
-
-export type PartnerMembershipStatus = "email_unverified" | "nda_pending" | "company_authority_pending" | "company_nda_pending" | "pending_approval" | "pending_admin_approval" | "approved" | "active" | "rejected" | "suspended" | "pending" | "disabled";
+export type PartnerMembershipStatus = "email_unverified" | "approved" | "active" | "rejected" | "suspended" | "disabled";
 
 export function isActiveAccessStatus(status: PartnerMembershipStatus) {
   return status === "approved" || status === "active";
@@ -298,8 +286,8 @@ export async function applyPartnerMembershipDecision(input: {
     const rows = await tx.select().from(partnerAccounts).where(eq(partnerAccounts.id, input.accountId)).limit(1);
     const account = rows[0];
     if (!account) throw new Error("Membership request was not found.");
-    if (input.nextStatus === "approved" && !["pending_approval", "pending_admin_approval"].includes(account.status)) throw new Error("Only complete pending memberships can be approved.");
-    if (input.nextStatus === "rejected" && !["pending_approval", "pending_admin_approval", "company_nda_pending"].includes(account.status)) throw new Error("Only pending memberships can be rejected.");
+    if (input.nextStatus === "approved" && !["active", "approved"].includes(account.status)) throw new Error("Only active memberships can be approved.");
+    if (input.nextStatus === "rejected" && !["active", "approved"].includes(account.status)) throw new Error("Only active memberships can be rejected.");
     if (input.nextStatus === "suspended" && !["active", "approved"].includes(account.status)) throw new Error("Only approved memberships can be suspended.");
 
     await tx.update(partnerAccounts).set({ status: input.nextStatus, ...(input.nextStatus === "approved" ? { accessLevel: input.accessLevel || "level_1", level3ApprovedAt: input.accessLevel === "level_3" ? new Date() : null } : {}) }).where(eq(partnerAccounts.id, account.id));
@@ -345,4 +333,38 @@ export async function revokePartnerSession(tokenHash: string) {
   const db = await getDb();
   if (!db) throw new Error("Partner session storage is temporarily unavailable");
   await db.update(partnerSessions).set({ revokedAt: new Date() }).where(eq(partnerSessions.tokenHash, tokenHash));
+}
+
+export async function createPartnerPasswordResetRecord(record: { accountId: number; codeHash: string; expiresAt: Date; requestIp: string; resendEmailId?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Partner password recovery storage is temporarily unavailable");
+  const result = await db.insert(partnerPasswordResetCodes).values(record);
+  return { id: Number(result[0].insertId) };
+}
+
+export async function getLatestPartnerPasswordResetRecord(accountId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Partner password recovery storage is temporarily unavailable");
+  const rows = await db.select().from(partnerPasswordResetCodes).where(eq(partnerPasswordResetCodes.accountId, accountId)).orderBy(desc(partnerPasswordResetCodes.createdAt)).limit(1);
+  return rows[0];
+}
+
+export async function incrementPartnerPasswordResetAttempts(resetId: number, attempts: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Partner password recovery storage is temporarily unavailable");
+  await db.update(partnerPasswordResetCodes).set({ attempts }).where(eq(partnerPasswordResetCodes.id, resetId));
+}
+
+export async function consumePartnerPasswordResetRecord(resetId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Partner password recovery storage is temporarily unavailable");
+  const result = await db.update(partnerPasswordResetCodes).set({ usedAt: new Date() }).where(and(eq(partnerPasswordResetCodes.id, resetId), isNull(partnerPasswordResetCodes.usedAt)));
+  return Number(result[0].affectedRows) === 1;
+}
+
+export async function updatePartnerPassword(accountId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Partner account storage is temporarily unavailable");
+  await db.update(partnerAccounts).set({ passwordHash }).where(eq(partnerAccounts.id, accountId));
+  await db.update(partnerSessions).set({ revokedAt: new Date() }).where(and(eq(partnerSessions.accountId, accountId), isNull(partnerSessions.revokedAt)));
 }

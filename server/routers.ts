@@ -21,16 +21,20 @@ import {
   refreshPendingPartnerAccount,
   revokePartnerSession,
   updatePartnerLastLogin,
-  requestPartnerMoreInformation,
   markPartnerEmailVerifiedActive,
   updatePartnerProfileImage,
   updateContactMessageStatus,
   applyRegisteredUserAccessDecision,
   listRegisteredUsers,
+  createPartnerPasswordResetRecord,
+  getLatestPartnerPasswordResetRecord,
+  incrementPartnerPasswordResetAttempts,
+  consumePartnerPasswordResetRecord,
+  updatePartnerPassword,
 } from "./db";
 import { ENV } from "./_core/env";
-import { MAX_VERIFICATION_ATTEMPTS, PARTNER_SESSION_COOKIE, PARTNER_SESSION_TTL_MS, PARTNER_VERIFICATION_TTL_MS, createPartnerSessionToken, createPartnerVerificationCode, hashPartnerSessionToken, hashPartnerVerificationCode, hashPartnerPassword, normalizePartnerEmail, verifyPartnerPassword } from "./partnerAuth";
-import { sendPartnerVerificationEmail } from "./partnerEmail";
+import { MAX_PASSWORD_RESET_ATTEMPTS, MAX_VERIFICATION_ATTEMPTS, PARTNER_PASSWORD_RESET_TTL_MS, PARTNER_SESSION_COOKIE, PARTNER_SESSION_TTL_MS, PARTNER_VERIFICATION_TTL_MS, createPartnerSessionToken, createPartnerVerificationCode, hashPartnerPassword, hashPartnerPasswordResetCode, hashPartnerSessionToken, hashPartnerVerificationCode, normalizePartnerEmail, verifyPartnerPassword } from "./partnerAuth";
+import { sendPartnerPasswordResetEmail, sendPartnerVerificationEmail } from "./partnerEmail";
 import { storePartnerProfileImage } from "./profileImage";
 import { sendSportixContactEmail } from "./resend";
 import { TRPCError } from "@trpc/server";
@@ -51,11 +55,12 @@ export const contactInput = z.object({
 const contactStatuses = z.enum(["new", "reviewed", "responded"]);
 const recentContactAttempts = new Map<string, number[]>();
 const recentPartnerEmailAttempts = new Map<string, number[]>();
+const recentPartnerSignupIpAttempts = new Map<string, number[]>();
 export const partnerSignupInput = z.object({
   fullName: z.string().trim().min(2, "Full name is required").max(160),
   email: z.string().trim().email("Enter a valid email address").max(320),
-  mobileNumber: z.string().trim().max(32).regex(/^$|^\+?[0-9][0-9\s().-]{5,30}$/, "Enter a valid mobile number").optional(),
-  password: z.string().min(12, "Password must contain at least 12 characters").max(128),
+  mobileNumber: z.string().trim().min(7, "Mobile number is required").max(32).regex(/^\+?[0-9][0-9\s().-]{5,30}$/, "Enter a valid mobile number"),
+  password: z.string().min(7, "Password must contain at least 7 characters").max(128),
   companyName: z.string().trim().max(200).optional(),
   jobTitle: z.string().trim().max(160).optional(),
   age: z.number().int().min(13, "You must be at least 13 years old").max(120, "Enter a valid age"),
@@ -66,9 +71,12 @@ export const partnerSignupInput = z.object({
   sportsChallenges: z.string().trim().min(10, "Tell us which sports challenges should be solved").max(3000),
   sportsSolutionIdea: z.string().trim().min(10, "Tell us about your sports solution idea").max(3000),
   profileImage: z.object({ base64: z.string().min(4).max(2_900_000), mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]) }).optional(),
+  website: z.string().max(200).optional(),
 });
 const partnerLoginInput = z.object({ email: z.string().trim().email(), password: z.string().min(1).max(128) });
 const partnerVerificationInput = z.object({ email: z.string().trim().email(), code: z.string().regex(/^\d{6}$/, "Enter the six-digit verification code") });
+export const partnerPasswordResetRequestInput = z.object({ email: z.string().trim().email() });
+export const partnerPasswordResetInput = z.object({ email: z.string().trim().email(), code: z.string().regex(/^\d{6}$/, "Enter the six-digit verification code"), newPassword: z.string().min(7, "Password must contain at least 7 characters").max(128) });
 
 function getClientIp(forwardedFor: string | string[] | undefined, fallbackIp?: string) {
   const forwarded = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
@@ -104,11 +112,19 @@ function enforcePartnerEmailRateLimit(email: string, now = Date.now()) {
   recentPartnerEmailAttempts.set(email, attempts);
 }
 
+function enforcePartnerSignupIpRateLimit(ip: string, now = Date.now()) {
+  const windowMs = 15 * 60 * 1_000;
+  const attempts = (recentPartnerSignupIpAttempts.get(ip) ?? []).filter(timestamp => now - timestamp < windowMs);
+  if (attempts.length >= 5) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many registration attempts. Please try again later." });
+  attempts.push(now);
+  recentPartnerSignupIpAttempts.set(ip, attempts);
+}
+
 function readPartnerSessionToken(cookieHeader?: string) {
   return parseCookie(cookieHeader ?? "")[PARTNER_SESSION_COOKIE];
 }
 
-function publicPartnerAccount(account: { id: number; fullName: string; email: string; status: "pending" | "active" | "disabled" | "email_unverified" | "nda_pending" | "company_authority_pending" | "company_nda_pending" | "pending_approval" | "pending_admin_approval" | "approved" | "rejected" | "suspended"; companyName: string | null; jobTitle: string | null; age?: number | null; gender?: "male" | "female" | null; weeklySportFrequency?: "0" | "1-2" | "3-4" | "5+" | null; currentSports?: string | null; aspirationalSport?: string | null; sportsChallenges?: string | null; sportsSolutionIdea?: string | null; profileImageUrl?: string | null }) {
+function publicPartnerAccount(account: { id: number; fullName: string; email: string;   status: "active" | "disabled" | "email_unverified" | "approved" | "rejected" | "suspended"; companyName: string | null; jobTitle: string | null; age?: number | null; gender?: "male" | "female" | null; weeklySportFrequency?: "0" | "1-2" | "3-4" | "5+" | null; currentSports?: string | null; aspirationalSport?: string | null; sportsChallenges?: string | null; sportsSolutionIdea?: string | null; profileImageUrl?: string | null }) {
   return { id: account.id, fullName: account.fullName, email: account.email, status: account.status, companyName: account.companyName, jobTitle: account.jobTitle, age: account.age ?? null, gender: account.gender ?? null, weeklySportFrequency: account.weeklySportFrequency ?? null, currentSports: account.currentSports ?? null, aspirationalSport: account.aspirationalSport ?? null, sportsChallenges: account.sportsChallenges ?? null, sportsSolutionIdea: account.sportsSolutionIdea ?? null, profileImageUrl: account.profileImageUrl ?? null };
 }
 
@@ -156,11 +172,14 @@ export const appRouter = router({
     }),
     signUp: publicProcedure.input(partnerSignupInput).mutation(async ({ input, ctx }) => {
       const email = normalizePartnerEmail(input.email);
+      const requestIp = getClientIp(ctx.req.headers["x-forwarded-for"], ctx.req.socket.remoteAddress);
+      if (isHoneypotSubmission(input.website)) throw new TRPCError({ code: "BAD_REQUEST", message: "Registration could not be completed." });
       enforcePartnerEmailRateLimit(email);
+      enforcePartnerSignupIpRateLimit(requestIp);
       const existing = await getPartnerAccountByEmail(email);
-      if (existing?.status === "active" || existing?.status === "pending_approval") throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email. Please log in or wait for membership approval." });
+      if (existing && existing.status !== "email_unverified") throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email. Please log in." });
       const accountValues = {
-        fullName: input.fullName.trim(), email, mobileNumber: input.mobileNumber?.trim() || null, passwordHash: await hashPartnerPassword(input.password),
+        fullName: input.fullName.trim(), email, mobileNumber: input.mobileNumber.trim(), passwordHash: await hashPartnerPassword(input.password),
         companyName: input.companyName?.trim() || null, jobTitle: input.jobTitle?.trim() || null,
         age: input.age, gender: input.gender, weeklySportFrequency: input.weeklySportFrequency,
         currentSports: input.currentSports.trim(), aspirationalSport: input.aspirationalSport.trim(), sportsChallenges: input.sportsChallenges.trim(), sportsSolutionIdea: input.sportsSolutionIdea.trim(),
@@ -177,7 +196,7 @@ export const appRouter = router({
       }
       const code = createPartnerVerificationCode();
       const emailResult = await sendPartnerVerificationEmail({ email, fullName: accountValues.fullName, code });
-      await createPartnerVerificationRecord({ accountId, codeHash: hashPartnerVerificationCode(accountId, code), expiresAt: new Date(Date.now() + PARTNER_VERIFICATION_TTL_MS), requestIp: getClientIp(ctx.req.headers["x-forwarded-for"], ctx.req.socket.remoteAddress), resendEmailId: emailResult.id });
+      await createPartnerVerificationRecord({ accountId, codeHash: hashPartnerVerificationCode(accountId, code), expiresAt: new Date(Date.now() + PARTNER_VERIFICATION_TTL_MS), requestIp, resendEmailId: emailResult.id });
       return { success: true, email } as const;
     }),
     resendCode: publicProcedure.input(z.object({ email: z.string().trim().email() })).mutation(async ({ input, ctx }) => {
@@ -206,6 +225,33 @@ export const appRouter = router({
       await issuePartnerSession(account.id, ctx);
       return { success: true, account: publicPartnerAccount({ ...account, status: "active" }) } as const;
     }),
+    requestPasswordReset: publicProcedure.input(partnerPasswordResetRequestInput).mutation(async ({ input, ctx }) => {
+      const email = normalizePartnerEmail(input.email);
+      const requestIp = getClientIp(ctx.req.headers["x-forwarded-for"], ctx.req.socket.remoteAddress);
+      enforcePartnerEmailRateLimit(email);
+      enforcePartnerSignupIpRateLimit(requestIp);
+      const account = await getPartnerAccountByEmail(email);
+      if (!account || !account.emailVerified || !["active", "approved"].includes(account.status)) return { success: true } as const;
+      const code = createPartnerVerificationCode();
+      const emailResult = await sendPartnerPasswordResetEmail({ email, fullName: account.fullName, code });
+      await createPartnerPasswordResetRecord({ accountId: account.id, codeHash: hashPartnerPasswordResetCode(account.id, code), expiresAt: new Date(Date.now() + PARTNER_PASSWORD_RESET_TTL_MS), requestIp, resendEmailId: emailResult.id });
+      return { success: true } as const;
+    }),
+    resetPassword: publicProcedure.input(partnerPasswordResetInput).mutation(async ({ input }) => {
+      const email = normalizePartnerEmail(input.email);
+      const account = await getPartnerAccountByEmail(email);
+      if (!account || !account.emailVerified || !["active", "approved"].includes(account.status)) throw new TRPCError({ code: "BAD_REQUEST", message: "This password reset request is no longer available." });
+      const record = await getLatestPartnerPasswordResetRecord(account.id);
+      if (!record || record.usedAt || record.expiresAt.getTime() <= Date.now()) throw new TRPCError({ code: "BAD_REQUEST", message: "This verification code is expired. Request a new code." });
+      if (record.attempts >= MAX_PASSWORD_RESET_ATTEMPTS) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many incorrect attempts. Request a new code." });
+      if (record.codeHash !== hashPartnerPasswordResetCode(account.id, input.code)) {
+        await incrementPartnerPasswordResetAttempts(record.id, record.attempts + 1);
+        throw new TRPCError({ code: "BAD_REQUEST", message: "The verification code is incorrect." });
+      }
+      if (!await consumePartnerPasswordResetRecord(record.id)) throw new TRPCError({ code: "BAD_REQUEST", message: "This verification code has already been used." });
+      await updatePartnerPassword(account.id, await hashPartnerPassword(input.newPassword));
+      return { success: true } as const;
+    }),
     login: publicProcedure.input(partnerLoginInput).mutation(async ({ input, ctx }) => {
       const account = await getPartnerAccountByEmail(normalizePartnerEmail(input.email));
       const valid = account ? await verifyPartnerPassword(input.password, account.passwordHash) : false;
@@ -227,7 +273,7 @@ export const appRouter = router({
     }),
   }),
   membership: router({
-    list: adminProcedure.input(z.object({ status: z.enum(["pending", "active", "disabled", "email_unverified", "nda_pending", "company_authority_pending", "company_nda_pending", "pending_approval", "pending_admin_approval", "approved", "rejected", "suspended"]).optional() }).optional()).query(({ input }) => listPartnerMembershipRequests(input?.status)),
+    list: adminProcedure.input(z.object({ status: z.enum(["active", "disabled", "email_unverified", "approved", "rejected", "suspended"]).optional() }).optional()).query(({ input }) => listPartnerMembershipRequests(input?.status)),
     decide: adminProcedure.input(z.object({ accountId: z.number().int().positive(), decision: z.enum(["approve", "reject", "suspend"]), accessLevel: z.enum(["level_1", "level_2", "level_3"]).optional(), note: z.string().trim().max(500).optional() })).mutation(async ({ input, ctx }) => {
       const nextStatus = input.decision === "approve" ? "approved" : input.decision === "reject" ? "rejected" : "suspended";
       try {
@@ -236,10 +282,6 @@ export const appRouter = router({
       } catch (error) {
         throw new TRPCError({ code: "BAD_REQUEST", message: error instanceof Error ? error.message : "Membership decision could not be applied." });
       }
-    }),
-    requestMoreInformation: adminProcedure.input(z.object({ accountId: z.number().int().positive(), note: z.string().trim().min(4).max(2_000) })).mutation(async ({ input, ctx }) => {
-      await requestPartnerMoreInformation(input.accountId, input.note);
-      return { success: true } as const;
     }),
   }),
   contact: router({

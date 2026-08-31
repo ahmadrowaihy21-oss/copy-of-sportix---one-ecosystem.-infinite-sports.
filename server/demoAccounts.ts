@@ -25,6 +25,7 @@ export function createApprovedDemoPartner(passwordHash: string): InsertPartnerAc
   return {
     fullName: DEMO_PARTNER_NAME,
     email: DEMO_PARTNER_EMAIL,
+    mobileNumber: "+966500000001",
     passwordHash,
     companyName: "SPORTIX Test Organisation",
     jobTitle: "Demo Partner",
@@ -44,14 +45,15 @@ export function createApprovedDemoPartner(passwordHash: string): InsertPartnerAc
   };
 }
 
-export function createPendingDemoApplicant(passwordHash: string): InsertPartnerAccount {
+export function createDemoApplicant(passwordHash: string): InsertPartnerAccount {
   return {
     ...createApprovedDemoPartner(passwordHash),
     fullName: DEMO_APPLICANT_NAME,
     email: DEMO_APPLICANT_EMAIL,
+    mobileNumber: "+966500000002",
     companyName: "SPORTIX Applicant Organisation",
     jobTitle: "Membership Applicant",
-    status: "pending_approval",
+    status: "active",
     accessLevel: "level_1",
   };
 }
