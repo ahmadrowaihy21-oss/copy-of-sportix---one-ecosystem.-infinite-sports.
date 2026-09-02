@@ -13,7 +13,7 @@ export function partnerPendingRoute(status: string) {
 export function registerPartnerAccessGuard(app: Express) {
   app.use(async (req, res, next) => {
     if (req.method !== "GET") return next();
-    if (req.path.startsWith("/admin/")) {
+    if (req.path.startsWith("/admin/") && req.path !== "/admin/login") {
       try {
         const user = await sdk.authenticateRequest(req);
         if (user.role === "admin") return next();

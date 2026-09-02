@@ -36,6 +36,7 @@ import {
   createPartnerNdaApprovalLink,
   getPartnerNdaApplicationForApprovalToken,
   getPartnerNdaApplicationForAccountId,
+  getPartnerNdaApplicationForAdminResend,
   markPartnerEmailVerifiedPendingNda,
   recordPartnerNdaAdminNotification,
   recordPartnerNdaApplicantApprovalEmail,
@@ -148,7 +149,7 @@ async function issuePartnerSession(accountId: number, ctx: { req: Parameters<typ
 
 async function deliverPartnerNdaApprovalEmail(applicationId: number, account: { email: string; fullName: string }) {
   try {
-    const email = await sendPartnerNdaApprovalEmail({ email: account.email, fullName: account.fullName, loginUrl: "https://sportixpartners.com/partner-access" });
+    const email = await sendPartnerNdaApprovalEmail({ email: account.email, fullName: account.fullName, loginUrl: "https://www.sportixpartners.com/partner-access" });
     await recordPartnerNdaApplicantApprovalEmail(applicationId, email.id);
     return { status: "sent" as const };
   } catch (error) {
@@ -313,7 +314,7 @@ export const appRouter = router({
       const application = await createOrReplacePartnerNdaApplication({ accountId: session.account.id, ndaFileKey: stored.key, ndaFileName: stored.fileName, ndaFileSize: stored.fileSize });
       const approvalToken = createPartnerNdaApprovalToken();
       await createPartnerNdaApprovalLink({ applicationId: application.id, tokenHash: hashPartnerNdaApprovalToken(approvalToken), expiresAt: new Date(Date.now() + PARTNER_NDA_APPROVAL_TTL_MS) });
-      const appOrigin = "https://sportixpartners.com";
+      const appOrigin = "https://www.sportixpartners.com";
       try {
         const notification = await sendPartnerNdaAccessRequestEmail({ adminEmail: ENV.contactRecipientEmail, fullName: session.account.fullName, companyName: session.account.companyName, jobTitle: session.account.jobTitle, email: session.account.email, mobileNumber: session.account.mobileNumber, viewNdaUrl: `${appOrigin}/admin/nda-review?t=${encodeURIComponent(approvalToken)}`, approveUrl: `${appOrigin}/admin/nda-approve?t=${encodeURIComponent(approvalToken)}` });
         await recordPartnerNdaAdminNotification(application.id, notification.id);
@@ -360,6 +361,20 @@ export const appRouter = router({
   }),
   membership: router({
     list: adminProcedure.input(z.object({ status: z.enum(["active", "disabled", "email_unverified", "pending_nda", "pending_approval", "approved", "rejected", "suspended"]).optional() }).optional()).query(({ input }) => listPartnerMembershipRequests(input?.status)),
+    resendNdaAlert: adminProcedure.input(z.object({ accountId: z.number().int().positive() })).mutation(async ({ input }) => {
+      const record = await getPartnerNdaApplicationForAdminResend(input.accountId);
+      if (!record || record.application.ndaStatus !== "pending" || record.application.accountStatus !== "pending_approval" || record.application.accessStatus !== "not_granted") throw new TRPCError({ code: "BAD_REQUEST", message: "This applicant does not have a pending NDA approval request." });
+      const approvalToken = createPartnerNdaApprovalToken();
+      await createPartnerNdaApprovalLink({ applicationId: record.application.id, tokenHash: hashPartnerNdaApprovalToken(approvalToken), expiresAt: new Date(Date.now() + PARTNER_NDA_APPROVAL_TTL_MS) });
+      const appOrigin = "https://www.sportixpartners.com";
+      try {
+        const email = await sendPartnerNdaAccessRequestEmail({ adminEmail: ENV.contactRecipientEmail, fullName: record.account.fullName, companyName: record.account.companyName, jobTitle: record.account.jobTitle, email: record.account.email, mobileNumber: record.account.mobileNumber, viewNdaUrl: `${appOrigin}/admin/nda-review?t=${encodeURIComponent(approvalToken)}`, approveUrl: `${appOrigin}/admin/nda-approve?t=${encodeURIComponent(approvalToken)}` });
+        await recordPartnerNdaAdminNotification(record.application.id, email.id);
+        return { success: true } as const;
+      } catch (error) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error instanceof Error ? error.message : "The NDA alert could not be resent." });
+      }
+    }),
     decide: adminProcedure.input(z.object({ accountId: z.number().int().positive(), decision: z.enum(["approve", "reject", "suspend"]), accessLevel: z.enum(["level_1", "level_2", "level_3"]).optional(), note: z.string().trim().max(500).optional() })).mutation(async ({ input, ctx }) => {
       if (input.decision === "approve") throw new TRPCError({ code: "BAD_REQUEST", message: "Approve access through the signed-NDA approval link only." });
       const nextStatus = input.decision === "reject" ? "rejected" : "suspended";

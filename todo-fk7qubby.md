@@ -15,3 +15,8 @@
 - [x] Persist applicant approval-email delivery state and enable authenticated administrators to retry a failed notification without re-approving access.
 - [x] Use the configured SPORTIX owner name as the protected-page watermark signature alongside the SPORTIX logo.
 - [x] Add explicit tests for expired and already-used approval actions, then save and publish the final verified checkpoint.
+- [x] Set www.sportixpartners.com as the canonical URL used by all SPORTIX access and approval emails.
+- [x] Diagnose why a signed-NDA submission did not notify the SPORTIX administrator and correct the delivery path.
+- [x] Test the corrected NDA notification delivery configuration and the secure admin resend action.
+- [x] Fix the administrator login redirect loop so secure review links can reach the SPORTIX sign-in page.
+- [x] Publish the canonical-domain and NDA notification correction, then provide the new live version.

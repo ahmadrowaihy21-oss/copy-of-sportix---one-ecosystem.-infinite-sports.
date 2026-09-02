@@ -37,7 +37,7 @@ describe("SPORTIX Partners verification delivery", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "nda_request_123" }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
     const { sendPartnerNdaAccessRequestEmail } = await import("./partnerEmail");
-    await expect(sendPartnerNdaAccessRequestEmail({ adminEmail: "admin@sportixpartners.com", fullName: "Applicant Example", companyName: "Example Co", jobTitle: "Sports Director", email: "applicant@example.com", mobileNumber: "+966501234567", viewNdaUrl: "https://sportixpartners.com/admin/nda-review?t=token", approveUrl: "https://sportixpartners.com/admin/nda-approve?t=token" })).resolves.toEqual({ id: "nda_request_123" });
+    await expect(sendPartnerNdaAccessRequestEmail({ adminEmail: "admin@sportixpartners.com", fullName: "Applicant Example", companyName: "Example Co", jobTitle: "Sports Director", email: "applicant@example.com", mobileNumber: "+966501234567", viewNdaUrl: "https://www.sportixpartners.com/admin/nda-review?t=token", approveUrl: "https://www.sportixpartners.com/admin/nda-approve?t=token" })).resolves.toEqual({ id: "nda_request_123" });
     const request = JSON.parse(fetchMock.mock.calls[0]?.[1].body as string);
     expect(request.subject).toBe("New SPORTIX Access Request");
     expect(request.html).toContain("VIEW NDA");
@@ -52,7 +52,7 @@ describe("SPORTIX Partners verification delivery", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "nda_approved_123" }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
     const { sendPartnerNdaApprovalEmail } = await import("./partnerEmail");
-    await expect(sendPartnerNdaApprovalEmail({ email: "applicant@example.com", fullName: "Applicant Example", loginUrl: "https://sportixpartners.com/partner-access" })).resolves.toEqual({ id: "nda_approved_123" });
+    await expect(sendPartnerNdaApprovalEmail({ email: "applicant@example.com", fullName: "Applicant Example", loginUrl: "https://www.sportixpartners.com/partner-access" })).resolves.toEqual({ id: "nda_approved_123" });
     const request = JSON.parse(fetchMock.mock.calls[0]?.[1].body as string);
     expect(request.subject).toBe("Your sportix Access Has Been Approved");
     expect(request.html).toContain("YALLA HAYYIHOM");

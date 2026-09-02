@@ -266,6 +266,13 @@ export async function getPartnerNdaApplicationForAccountId(accountId: number) {
   return rows[0];
 }
 
+export async function getPartnerNdaApplicationForAdminResend(accountId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("NDA application storage is temporarily unavailable");
+  const rows = await db.select({ application: partnerNdaApplications, account: partnerAccounts }).from(partnerNdaApplications).innerJoin(partnerAccounts, eq(partnerNdaApplications.accountId, partnerAccounts.id)).where(eq(partnerNdaApplications.accountId, accountId)).limit(1);
+  return rows[0];
+}
+
 export async function recordPartnerNdaApplicantApprovalEmail(applicationId: number, emailId: string) {
   const db = await getDb();
   if (!db) throw new Error("NDA application storage is temporarily unavailable");
