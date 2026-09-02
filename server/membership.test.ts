@@ -45,9 +45,8 @@ describe("SPORTIX membership administration", () => {
     await expect(caller("user").membership.list()).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 
-  it("records a protected approval decision with the authenticated administrator", async () => {
-    db.applyPartnerMembershipDecision.mockResolvedValue({ previousStatus: "active", nextStatus: "approved" });
-    await expect(caller("admin").membership.decide({ accountId: 17, decision: "approve", note: "Verified partner profile." })).resolves.toMatchObject({ success: true, nextStatus: "approved" });
-    expect(db.applyPartnerMembershipDecision).toHaveBeenCalledWith({ accountId: 17, nextStatus: "approved", actorUserId: 41, note: "Verified partner profile." });
+  it("refuses manual approvals so access can only be granted through a signed-NDA link", async () => {
+    await expect(caller("admin").membership.decide({ accountId: 17, decision: "approve", note: "Verified partner profile." })).rejects.toMatchObject({ code: "BAD_REQUEST", message: "Approve access through the signed-NDA approval link only." });
+    expect(db.applyPartnerMembershipDecision).not.toHaveBeenCalled();
   });
 });

@@ -1,0 +1,17 @@
+# Project TODO
+
+- [x] Review the existing SPORTIX ECOSYSTEM implementation and identify the relevant edit surface.
+- [x] Confirm the user's requested changes and acceptance criteria.
+- [x] Implement, test, visually verify, and publish the approved changes.
+- [x] Add an NDA application submission flow that captures applicant details, accepts a signed PDF, and records a pending approval state.
+- [x] Store uploaded NDA PDFs securely and expose them only through authenticated admin-only review endpoints.
+- [x] Send a SPORTIX admin notification email with applicant details, NDA review link, and a secure approval action link.
+- [x] Implement expiring, unique, single-use, admin-authenticated approval links that resume approval after admin login.
+- [x] Approve NDA, account, and access states atomically and notify the applicant with a login email.
+- [x] Enforce approved-only access across protected SPORTIX pages, files, APIs, and prototype content on the server.
+- [x] Add a visible SPORTIX logo and owner-signature watermark across protected pages.
+- [x] Add focused tests for application validation, approval authorization, token expiry and reuse, access enforcement, and email payloads.
+- [x] Verify the workflow visually, save a published checkpoint, and provide the live version.
+- [x] Persist applicant approval-email delivery state and enable authenticated administrators to retry a failed notification without re-approving access.
+- [x] Use the configured SPORTIX owner name as the protected-page watermark signature alongside the SPORTIX logo.
+- [x] Add explicit tests for expired and already-used approval actions, then save and publish the final verified checkpoint.

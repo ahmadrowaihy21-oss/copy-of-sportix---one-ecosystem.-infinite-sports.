@@ -73,7 +73,7 @@ export const partnerAccounts = mysqlTable("partner_accounts", {
   sportsSolutionIdea: text("sportsSolutionIdea"),
   profileImageKey: varchar("profileImageKey", { length: 512 }),
   profileImageUrl: varchar("profileImageUrl", { length: 700 }),
-  status: mysqlEnum("status", ["active", "disabled", "email_unverified", "approved", "rejected", "suspended"]).default("email_unverified").notNull(),
+  status: mysqlEnum("status", ["active", "disabled", "email_unverified", "pending_nda", "pending_approval", "approved", "rejected", "suspended"]).default("email_unverified").notNull(),
   emailVerified: boolean("emailVerified").default(false).notNull(),
   emailVerifiedAt: timestamp("emailVerifiedAt"),
   verificationMethod: varchar("verificationMethod", { length: 32 }),
@@ -109,6 +109,36 @@ export const partnerSessions = mysqlTable("partner_sessions", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+/** Signed NDA metadata for each access application. The PDF bytes stay in private object storage. */
+export const partnerNdaApplications = mysqlTable("partner_nda_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  accountId: int("accountId").notNull().unique(),
+  ndaFileKey: varchar("ndaFileKey", { length: 512 }).notNull(),
+  ndaFileName: varchar("ndaFileName", { length: 255 }).notNull(),
+  ndaFileSize: int("ndaFileSize").notNull(),
+  ndaStatus: mysqlEnum("ndaStatus", ["pending", "approved"]).default("pending").notNull(),
+  accountStatus: mysqlEnum("accountStatus", ["pending_approval", "approved"]).default("pending_approval").notNull(),
+  accessStatus: mysqlEnum("accessStatus", ["not_granted", "granted"]).default("not_granted").notNull(),
+  adminNotificationEmailId: varchar("adminNotificationEmailId", { length: 128 }),
+  applicantApprovalEmailId: varchar("applicantApprovalEmailId", { length: 128 }),
+  approvalEmailStatus: mysqlEnum("approvalEmailStatus", ["pending", "sent", "failed"]).default("pending").notNull(),
+  approvalEmailError: varchar("approvalEmailError", { length: 500 }),
+  approvedAt: timestamp("approvedAt"),
+  approvedBy: int("approvedBy"),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/** Opaque, single-use approval actions. Only a hash is persisted. */
+export const partnerNdaApprovalLinks = mysqlTable("partner_nda_approval_links", {
+  id: int("id").autoincrement().primaryKey(),
+  applicationId: int("applicationId").notNull(),
+  tokenHash: varchar("tokenHash", { length: 64 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 /** Immutable record of each protected membership decision for accountability and troubleshooting. */
 export const partnerMembershipAudits = mysqlTable("partner_membership_audits", {
   id: int("id").autoincrement().primaryKey(),
@@ -135,3 +165,5 @@ export const partnerPasswordResetCodes = mysqlTable("partner_password_reset_code
 
 export type PartnerAccount = typeof partnerAccounts.$inferSelect;
 export type InsertPartnerAccount = typeof partnerAccounts.$inferInsert;
+export type PartnerNdaApplication = typeof partnerNdaApplications.$inferSelect;
+export type InsertPartnerNdaApplication = typeof partnerNdaApplications.$inferInsert;

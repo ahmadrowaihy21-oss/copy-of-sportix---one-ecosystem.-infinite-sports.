@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { sdk } from "./sdk";
 import { ENV } from "./env";
 
 export function registerStorageProxy(app: Express) {
@@ -7,6 +8,16 @@ export function registerStorageProxy(app: Express) {
     if (!key) {
       res.status(400).send("Missing storage key");
       return;
+    }
+
+    if (key.startsWith("partner-ndas/")) {
+      try {
+        const user = await sdk.authenticateRequest(req);
+        if (user.role !== "admin") throw new Error("Not an administrator");
+      } catch {
+        res.status(403).send("NDA files are restricted to authenticated SPORTIX administrators");
+        return;
+      }
     }
 
     if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {

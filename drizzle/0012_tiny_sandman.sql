@@ -1,0 +1,2 @@
+ALTER TABLE `partner_nda_applications` ADD `approvalEmailStatus` enum('pending','sent','failed') DEFAULT 'pending' NOT NULL;--> statement-breakpoint
+ALTER TABLE `partner_nda_applications` ADD `approvalEmailError` varchar(500);
