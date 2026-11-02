@@ -1,5 +1,5 @@
 export function isPartnerGatewayPath(location: string): boolean {
-  return location === "/partner-access" || location === "/partner-access/nda" || location === "/partner-access/pending";
+  return location === "/partner-access";
 }
 
 export function isAdminPath(location: string): boolean {

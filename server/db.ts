@@ -1,6 +1,6 @@
 import { and, desc, eq, gt, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { contactMessages, InsertContactMessage, InsertPartnerAccount, InsertUser, partnerAccounts, partnerMembershipAudits, partnerNdaApplications, partnerNdaApprovalLinks, partnerPasswordResetCodes, partnerSessions, partnerVerificationCodes, users } from "../drizzle/schema";
+import { contactMessages, InsertContactMessage, InsertPartnerAccount, InsertUser, partnerAccounts, partnerMembershipAudits, partnerPasswordResetCodes, partnerSessions, partnerVerificationCodes, users } from "../drizzle/schema";
 import type { RegisteredUserAccessStatus } from "./registeredUserAccess";
 import { ENV } from './_core/env';
 
@@ -217,93 +217,6 @@ export async function updatePartnerProfileImage(accountId: number, profileImage:
   await db.update(partnerAccounts).set({ profileImageKey: profileImage.key, profileImageUrl: profileImage.url }).where(eq(partnerAccounts.id, accountId));
 }
 
-export async function createOrReplacePartnerNdaApplication(input: { accountId: number; ndaFileKey: string; ndaFileName: string; ndaFileSize: number }) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA application storage is temporarily unavailable");
-  return db.transaction(async tx => {
-    const existing = await tx.select().from(partnerNdaApplications).where(eq(partnerNdaApplications.accountId, input.accountId)).limit(1);
-    const values = { ndaFileKey: input.ndaFileKey, ndaFileName: input.ndaFileName, ndaFileSize: input.ndaFileSize, ndaStatus: "pending" as const, accountStatus: "pending_approval" as const, accessStatus: "not_granted" as const, adminNotificationEmailId: null, applicantApprovalEmailId: null, approvedAt: null, approvedBy: null };
-    const application = existing[0];
-    if (application) {
-      await tx.update(partnerNdaApplications).set(values).where(eq(partnerNdaApplications.id, application.id));
-      await tx.update(partnerNdaApprovalLinks).set({ usedAt: new Date() }).where(and(eq(partnerNdaApprovalLinks.applicationId, application.id), isNull(partnerNdaApprovalLinks.usedAt)));
-      await tx.update(partnerAccounts).set({ status: "pending_approval" }).where(eq(partnerAccounts.id, input.accountId));
-      await tx.update(partnerSessions).set({ revokedAt: new Date() }).where(and(eq(partnerSessions.accountId, input.accountId), isNull(partnerSessions.revokedAt)));
-      return { id: application.id };
-    }
-    const result = await tx.insert(partnerNdaApplications).values({ accountId: input.accountId, ...values });
-    const applicationId = Number(result[0].insertId);
-    await tx.update(partnerAccounts).set({ status: "pending_approval" }).where(eq(partnerAccounts.id, input.accountId));
-    await tx.update(partnerSessions).set({ revokedAt: new Date() }).where(and(eq(partnerSessions.accountId, input.accountId), isNull(partnerSessions.revokedAt)));
-    return { id: applicationId };
-  });
-}
-
-export async function createPartnerNdaApprovalLink(input: { applicationId: number; tokenHash: string; expiresAt: Date }) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA approval-link storage is temporarily unavailable");
-  const result = await db.insert(partnerNdaApprovalLinks).values(input);
-  return { id: Number(result[0].insertId) };
-}
-
-export async function getPartnerNdaApplicationForApprovalToken(tokenHash: string) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA application storage is temporarily unavailable");
-  const rows = await db.select({ application: partnerNdaApplications, account: partnerAccounts, approvalLink: partnerNdaApprovalLinks }).from(partnerNdaApprovalLinks).innerJoin(partnerNdaApplications, eq(partnerNdaApprovalLinks.applicationId, partnerNdaApplications.id)).innerJoin(partnerAccounts, eq(partnerNdaApplications.accountId, partnerAccounts.id)).where(eq(partnerNdaApprovalLinks.tokenHash, tokenHash)).limit(1);
-  return rows[0];
-}
-
-export async function recordPartnerNdaAdminNotification(applicationId: number, emailId: string) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA application storage is temporarily unavailable");
-  await db.update(partnerNdaApplications).set({ adminNotificationEmailId: emailId }).where(eq(partnerNdaApplications.id, applicationId));
-}
-
-export async function getPartnerNdaApplicationForAccountId(accountId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA application storage is temporarily unavailable");
-  const rows = await db.select().from(partnerNdaApplications).where(eq(partnerNdaApplications.accountId, accountId)).limit(1);
-  return rows[0];
-}
-
-export async function getPartnerNdaApplicationForAdminResend(accountId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA application storage is temporarily unavailable");
-  const rows = await db.select({ application: partnerNdaApplications, account: partnerAccounts }).from(partnerNdaApplications).innerJoin(partnerAccounts, eq(partnerNdaApplications.accountId, partnerAccounts.id)).where(eq(partnerNdaApplications.accountId, accountId)).limit(1);
-  return rows[0];
-}
-
-export async function recordPartnerNdaApplicantApprovalEmail(applicationId: number, emailId: string) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA application storage is temporarily unavailable");
-  await db.update(partnerNdaApplications).set({ applicantApprovalEmailId: emailId, approvalEmailStatus: "sent", approvalEmailError: null }).where(eq(partnerNdaApplications.id, applicationId));
-}
-
-export async function recordPartnerNdaApplicantApprovalEmailFailure(applicationId: number, error: string) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA application storage is temporarily unavailable");
-  await db.update(partnerNdaApplications).set({ approvalEmailStatus: "failed", approvalEmailError: error.slice(0, 500) }).where(eq(partnerNdaApplications.id, applicationId));
-}
-
-export async function approvePartnerNdaApplication(input: { tokenHash: string; actorUserId: number }) {
-  const db = await getDb();
-  if (!db) throw new Error("NDA approval-link storage is temporarily unavailable");
-  return db.transaction(async tx => {
-    const rows = await tx.select({ application: partnerNdaApplications, account: partnerAccounts, approvalLink: partnerNdaApprovalLinks }).from(partnerNdaApprovalLinks).innerJoin(partnerNdaApplications, eq(partnerNdaApprovalLinks.applicationId, partnerNdaApplications.id)).innerJoin(partnerAccounts, eq(partnerNdaApplications.accountId, partnerAccounts.id)).where(eq(partnerNdaApprovalLinks.tokenHash, input.tokenHash)).limit(1);
-    const record = rows[0];
-    if (!record) throw new Error("This approval request was not found.");
-    if (record.approvalLink.usedAt || record.approvalLink.expiresAt.getTime() <= Date.now()) throw new Error("This approval request has expired or was already used.");
-    if (record.application.ndaStatus !== "pending" || record.application.accessStatus !== "not_granted") throw new Error("This application has already been processed.");
-    const now = new Date();
-    const consumed = await tx.update(partnerNdaApprovalLinks).set({ usedAt: now }).where(and(eq(partnerNdaApprovalLinks.id, record.approvalLink.id), isNull(partnerNdaApprovalLinks.usedAt), gt(partnerNdaApprovalLinks.expiresAt, now)));
-    if (Number(consumed[0].affectedRows) !== 1) throw new Error("This approval request has expired or was already used.");
-    await tx.update(partnerNdaApplications).set({ ndaStatus: "approved", accountStatus: "approved", accessStatus: "granted", approvedAt: now, approvedBy: input.actorUserId }).where(eq(partnerNdaApplications.id, record.application.id));
-    await tx.update(partnerAccounts).set({ status: "approved" }).where(eq(partnerAccounts.id, record.account.id));
-    await tx.insert(partnerMembershipAudits).values({ accountId: record.account.id, previousStatus: record.account.status, nextStatus: "approved", actorUserId: input.actorUserId, note: "NDA approved and access granted" });
-    return { application: record.application, account: record.account };
-  });
-}
-
 export async function createPartnerVerificationRecord(record: { accountId: number; codeHash: string; expiresAt: Date; requestIp: string; resendEmailId?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Partner verification storage is temporarily unavailable");
@@ -337,19 +250,13 @@ export async function markPartnerEmailVerifiedActive(accountId: number) {
   await db.update(partnerAccounts).set({ status: "active", emailVerified: true, emailVerifiedAt: new Date(), verificationMethod: "email_code", verificationStatus: "verified" }).where(eq(partnerAccounts.id, accountId));
 }
 
-export async function markPartnerEmailVerifiedPendingNda(accountId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Partner account storage is temporarily unavailable");
-  await db.update(partnerAccounts).set({ status: "pending_nda", emailVerified: true, emailVerifiedAt: new Date(), verificationMethod: "email_code", verificationStatus: "verified" }).where(eq(partnerAccounts.id, accountId));
-}
-
 export async function updatePartnerMembershipStatus(accountId: number, status: PartnerMembershipStatus) {
   const db = await getDb();
   if (!db) throw new Error("Partner account storage is temporarily unavailable");
   await db.update(partnerAccounts).set({ status }).where(eq(partnerAccounts.id, accountId));
 }
 
-export type PartnerMembershipStatus = "email_unverified" | "pending_nda" | "pending_approval" | "approved" | "active" | "rejected" | "suspended" | "disabled";
+export type PartnerMembershipStatus = "email_unverified" | "approved" | "active" | "rejected" | "suspended" | "disabled";
 
 export function isActiveAccessStatus(status: PartnerMembershipStatus) {
   return status === "approved" || status === "active";

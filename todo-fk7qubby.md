@@ -20,3 +20,8 @@
 - [x] Test the corrected NDA notification delivery configuration and the secure admin resend action.
 - [x] Fix the administrator login redirect loop so secure review links can reach the SPORTIX sign-in page.
 - [x] Publish the canonical-domain and NDA notification correction, then provide the new live version.
+- [ ] Replace the obsolete `www` Netlify DNS record with the Manus-managed SPORTIX website destination.
+- [ ] Connect `www.sportixpartners.com` to the SPORTIX website and make it primary when the control is available.
+- [ ] Verify public DNS, HTTPS, canonical navigation, and NDA action-link reachability after the cutover.
+- [x] Remove the NDA upload, review, approval, notification, and approval-gated access workflow while preserving verified-email registration and server-side access enforcement.
+- [x] Update tests and UI for the no-NDA registration flow, run checks/build, and publish a new checkpoint.

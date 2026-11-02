@@ -1,14 +1,10 @@
 import type { Express } from "express";
 import { parse as parseCookie } from "cookie";
-import { getActivePartnerSession, getPartnerNdaApplicationForAccountId } from "./db";
+import { getActivePartnerSession } from "./db";
 import { PARTNER_SESSION_COOKIE, hashPartnerSessionToken } from "./partnerAuth";
 import { sdk } from "./_core/sdk";
 
 const protectedPartnerPaths = new Set(["/", "/profile", "/opportunity", "/go-sportix", "/marketplace", "/marketplace/cart", "/marketplace/checkout"]);
-
-export function partnerPendingRoute(status: string) {
-  return status === "pending_nda" ? "/partner-access/nda" : "/partner-access/pending";
-}
 
 export function registerPartnerAccessGuard(app: Express) {
   app.use(async (req, res, next) => {
@@ -37,13 +33,8 @@ export function registerPartnerAccessGuard(app: Express) {
       res.redirect(302, "/partner-access");
       return;
     }
-    if (session.account.status !== "approved") {
-      res.redirect(302, partnerPendingRoute(session.account.status));
-      return;
-    }
-    const ndaApplication = await getPartnerNdaApplicationForAccountId(session.account.id).catch(() => null);
-    if (!ndaApplication || ndaApplication.ndaStatus !== "approved" || ndaApplication.accountStatus !== "approved" || ndaApplication.accessStatus !== "granted") {
-      res.redirect(302, "/partner-access/pending");
+    if (session.account.status !== "active" && session.account.status !== "approved") {
+      res.redirect(302, "/partner-access");
       return;
     }
     next();

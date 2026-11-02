@@ -18,11 +18,6 @@ import MarketplaceCart from "./pages/MarketplaceCart";
 import MarketplaceCheckout from "./pages/MarketplaceCheckout";
 import GoSportix from "./pages/GoSportix";
 import IndividualAccess from "./pages/IndividualAccess";
-import NdaUpload from "./pages/NdaUpload";
-import NdaPendingApproval from "./pages/NdaPendingApproval";
-import NdaReview from "./pages/NdaReview";
-import NdaApprove from "./pages/NdaApprove";
-import AdminApprovalLogin from "./pages/AdminApprovalLogin";
 import ProtectedWatermark from "./components/ProtectedWatermark";
 import { canBypassPartnerGateway } from "./pages/homeAccess";
 import { isAdminPath, isPartnerGatewayPath } from "./pages/individualAccessRoute";
@@ -35,25 +30,21 @@ function Router() {
 
   if (isAdminPath(location)) {
     if (projectSession.isLoading) return <IndividualAccess />;
-    if (!isProjectAdmin) return <AdminApprovalLogin />;
+    if (!isProjectAdmin) return <IndividualAccess />;
     return <><ProtectedWatermark /><Switch>
       <Route path="/admin/memberships" component={MembershipRequests} />
       <Route path="/admin/inquiries" component={Inquiries} />
-      <Route path="/admin/nda-review" component={NdaReview} />
-      <Route path="/admin/nda-approve" component={NdaApprove} />
       <Route component={NotFound} />
     </Switch></>;
   }
 
   // SPORTIX administrators authenticate through Manus OAuth, not the separate partner-password gateway.
   // The server remains the authority for all protected administrator operations.
-  if (location === "/partner-access/nda") return <NdaUpload />;
-  if (location === "/partner-access/pending") return <NdaPendingApproval />;
   if (isPartnerGatewayPath(location)) return <AuthGateway onAuthenticated={() => { void utils.partnerAuth.session.invalidate(); window.location.assign("/"); }} />;
   if (projectSession.isLoading || partnerSession.isLoading) return <IndividualAccess />;
   if (isProjectAdmin && location === "/") return <><ProtectedWatermark /><Home isProjectAdmin /></>;
   if (!partnerSession.data) return <IndividualAccess />;
-  if (partnerSession.data.status !== "approved") return <IndividualAccess />;
+  if (!( ["active", "approved"] as string[]).includes(partnerSession.data.status)) return <IndividualAccess />;
 
   return (
     <><ProtectedWatermark /><Switch>

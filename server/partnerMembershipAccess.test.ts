@@ -3,7 +3,7 @@ import type { TrpcContext } from "./_core/context";
 import { hashPartnerPassword } from "./partnerAuth";
 
 const db = vi.hoisted(() => ({
-  applyPartnerMembershipDecision: vi.fn(), applyRegisteredUserAccessDecision: vi.fn(), consumePartnerVerificationRecord: vi.fn(), createPartnerSession: vi.fn(), createPartnerVerificationRecord: vi.fn(), createPendingPartnerAccount: vi.fn(), createContactMessage: vi.fn(), getActivePartnerSession: vi.fn(), getLatestPartnerVerificationRecord: vi.fn(), getPartnerNdaApplicationForAccountId: vi.fn(), getPartnerAccountByEmail: vi.fn(), incrementPartnerVerificationAttempts: vi.fn(), listContactMessages: vi.fn(), listPartnerMembershipRequests: vi.fn(), listRegisteredUsers: vi.fn(), markContactEmailAccepted: vi.fn(), markContactEmailFailed: vi.fn(), markPartnerEmailVerifiedActive: vi.fn(), markPartnerEmailVerifiedPendingNda: vi.fn(), refreshPendingPartnerAccount: vi.fn(), revokePartnerSession: vi.fn(), updatePartnerLastLogin: vi.fn(), updatePartnerProfileImage: vi.fn(), updateContactMessageStatus: vi.fn(),
+  applyPartnerMembershipDecision: vi.fn(), applyRegisteredUserAccessDecision: vi.fn(), consumePartnerVerificationRecord: vi.fn(), createPartnerSession: vi.fn(), createPartnerVerificationRecord: vi.fn(), createPendingPartnerAccount: vi.fn(), createContactMessage: vi.fn(), getActivePartnerSession: vi.fn(), getLatestPartnerVerificationRecord: vi.fn(), getPartnerAccountByEmail: vi.fn(), incrementPartnerVerificationAttempts: vi.fn(), listContactMessages: vi.fn(), listPartnerMembershipRequests: vi.fn(), listRegisteredUsers: vi.fn(), markContactEmailAccepted: vi.fn(), markContactEmailFailed: vi.fn(), markPartnerEmailVerifiedActive: vi.fn(), refreshPendingPartnerAccount: vi.fn(), revokePartnerSession: vi.fn(), updatePartnerLastLogin: vi.fn(), updatePartnerProfileImage: vi.fn(), updateContactMessageStatus: vi.fn(),
 }));
 vi.mock("./db", () => db);
 vi.mock("./partnerEmail", () => ({ sendPartnerVerificationEmail: vi.fn() }));
@@ -51,8 +51,7 @@ describe("SPORTIX Partner membership access", () => {
   });
 
   it.each([
-    ["pending_nda", "Upload your signed NDA to continue."],
-    ["pending_approval", "Your signed NDA is under review. Access will be granted after administrator approval."],
+    ["email_unverified", "Verify your email before logging in."],
     ["rejected", "This membership request was not approved."],
     ["suspended", "This membership is suspended."],
     ["disabled", "This account is disabled."],
@@ -64,7 +63,6 @@ describe("SPORTIX Partner membership access", () => {
 
   it("allows a verified membership to sign in immediately", async () => {
     db.getPartnerAccountByEmail.mockResolvedValue({ id: 23, fullName: "Immediate Partner", email: "immediate@example.com", mobileNumber: "+966501234501", passwordHash: await hashPartnerPassword("Membership_Test_Password"), companyName: null, jobTitle: null, status: "active", emailVerifiedAt: new Date(), lastLoginAt: null, createdAt: new Date(), updatedAt: new Date() });
-    db.getPartnerNdaApplicationForAccountId.mockResolvedValue({ ndaStatus: "approved", accountStatus: "approved", accessStatus: "granted" });
     await expect(caller().partnerAuth.login({ email: "immediate@example.com", password: "Membership_Test_Password" })).resolves.toMatchObject({ success: true, account: { status: "active" } });
     expect(db.createPartnerSession).toHaveBeenCalled();
   });
