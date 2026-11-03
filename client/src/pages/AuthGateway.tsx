@@ -1,14 +1,13 @@
 import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
 import SportixBrandMark from "../components/SportixBrandMark";
-import { ArrowRight, CircleAlert, ImagePlus, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
-import React, { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { ArrowRight, CircleAlert, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
+import React, { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import "../partner-auth.css";
 import "../partner-profile.css";
 
 const logoUrl = "/manus-storage/sportix-ecosystem-approved-logo_e0eb06c5.png";
 type GatewayStep = "landing" | "login" | "signup" | "verify" | "forgot" | "reset";
-type ProfileImage = { base64: string; mimeType: "image/jpeg" | "image/png" | "image/webp"; preview: string };
 export const PENDING_VERIFICATION_EMAIL_KEY = "sportix-partners-pending-verification-email";
 
 export function readPendingVerificationEmail(storage: Pick<Storage, "getItem">) {
@@ -27,8 +26,7 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
   const [forgotEmail, setForgotEmail] = useState("");
   const [resetPassword, setResetPassword] = useState("");
   const [resetConfirmPassword, setResetConfirmPassword] = useState("");
-  const [signup, setSignup] = useState({ fullName: "", email: "", mobileNumber: "", password: "", confirmPassword: "", companyName: "", jobTitle: "", age: "", gender: "", weeklySportFrequency: "", currentSports: "", aspirationalSport: "", sportsChallenges: "", sportsSolutionIdea: "", website: "" });
-  const [profileImage, setProfileImage] = useState<ProfileImage | null>(null);
+  const [signup, setSignup] = useState({ firstName: "", familyName: "", email: "", mobileNumber: "", password: "", confirmPassword: "", age: "", website: "" });
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [resetDigits, setResetDigits] = useState(["", "", "", "", "", ""]);
   const [message, setMessage] = useState("");
@@ -74,7 +72,7 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
     event.preventDefault();
     if (signup.password !== signup.confirmPassword) { setMessage("Passwords do not match."); return; }
     setMessage("");
-    signupMutation.mutate({ fullName: signup.fullName, email: signup.email, mobileNumber: signup.mobileNumber, password: signup.password, companyName: signup.companyName || undefined, jobTitle: signup.jobTitle || undefined, age: Number(signup.age), gender: signup.gender as "male" | "female", weeklySportFrequency: signup.weeklySportFrequency as "0" | "1-2" | "3-4" | "5+", currentSports: signup.currentSports, aspirationalSport: signup.aspirationalSport, sportsChallenges: signup.sportsChallenges, sportsSolutionIdea: signup.sportsSolutionIdea, website: signup.website, profileImage: profileImage ? { base64: profileImage.base64, mimeType: profileImage.mimeType } : undefined });
+    signupMutation.mutate({ firstName: signup.firstName, familyName: signup.familyName, email: signup.email, mobileNumber: signup.mobileNumber, password: signup.password, age: Number(signup.age), website: signup.website });
   };
   const submitForgot = (event: FormEvent) => { event.preventDefault(); setMessage(""); setForgotEmail(forgotEmail.trim().toLowerCase()); passwordResetRequestMutation.mutate({ email: forgotEmail.trim().toLowerCase() }); };
   const submitReset = (event: FormEvent) => { event.preventDefault(); const code = resetDigits.join(""); if (code.length !== 6) { setMessage("Enter the complete six-digit code."); return; } if (resetPassword !== resetConfirmPassword) { setMessage("Passwords do not match."); return; } setMessage(""); passwordResetMutation.mutate({ email: forgotEmail.trim().toLowerCase(), code, newPassword: resetPassword }); };
@@ -86,21 +84,6 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
   };
   const setResetDigit = (index: number, value: string) => setResetDigits(current => current.map((item, itemIndex) => itemIndex === index ? value.replace(/\D/g, "").slice(-1) : item));
   const handleDigitKey = (event: KeyboardEvent<HTMLInputElement>, index: number) => { if (event.key === "Backspace" && !digits[index] && index > 0) inputs.current[index - 1]?.focus(); };
-  const handleProfileImage = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 2 * 1024 * 1024) { setMessage("Profile image must be a JPEG, PNG, or WebP file up to 2 MB."); event.target.value = ""; return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : "";
-      const base64 = result.split(",")[1];
-      if (!base64) { setMessage("Profile image could not be read."); return; }
-      setProfileImage({ base64, mimeType: file.type as ProfileImage["mimeType"], preview: result });
-      setMessage("");
-    };
-    reader.readAsDataURL(file);
-  };
-
   return <main className="partner-gateway" aria-live="polite">
     <div className="partner-gateway-grid" aria-hidden="true" />
     <section className="partner-gateway-shell">
@@ -127,10 +110,8 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
         </form>}
         {step === "signup" && <form className="partner-gateway-stage partner-signup" onSubmit={submitSignup}>
           <button type="button" className="partner-back" onClick={() => selectStep("landing")}>← BACK</button><Mail size={26} className="partner-gateway-icon" /><p className="partner-gateway-kicker">NEW PARTNER</p><h2>CREATE <em>ACCESS.</em></h2>
-          <div className="partner-form-grid"><label>Full Name<input autoComplete="name" value={signup.fullName} onChange={event => setSignup({ ...signup, fullName: event.target.value })} required /></label><label>Work Email Address<input type="email" autoComplete="email" value={signup.email} onChange={event => setSignup({ ...signup, email: event.target.value })} required /></label><label>Mobile Number <small>REQUIRED</small><input type="tel" autoComplete="tel" value={signup.mobileNumber} onChange={event => setSignup({ ...signup, mobileNumber: event.target.value })} required /></label><label>Company / Organization <small>OPTIONAL</small><input autoComplete="organization" value={signup.companyName} onChange={event => setSignup({ ...signup, companyName: event.target.value })} /></label><label>Password<small>MINIMUM 7 CHARACTERS</small><input type="password" autoComplete="new-password" minLength={7} value={signup.password} onChange={event => setSignup({ ...signup, password: event.target.value })} required /></label><label>Confirm Password<input type="password" autoComplete="new-password" minLength={7} value={signup.confirmPassword} onChange={event => setSignup({ ...signup, confirmPassword: event.target.value })} required /></label><label className="partner-span-2">Job Title <small>OPTIONAL</small><input autoComplete="organization-title" value={signup.jobTitle} onChange={event => setSignup({ ...signup, jobTitle: event.target.value })} /></label></div>
-          <div className="partner-profile-section"><p>YOUR SPORT PROFILE <small>REQUIRED</small></p><div className="partner-form-grid"><label>Age<input type="number" min="13" max="120" inputMode="numeric" value={signup.age} onChange={event => setSignup({ ...signup, age: event.target.value })} required /></label><label>Gender<select value={signup.gender} onChange={event => setSignup({ ...signup, gender: event.target.value })} required><option value="" disabled>Select</option><option value="male">Male</option><option value="female">Female</option></select></label><label>Sport Sessions Per Week<select value={signup.weeklySportFrequency} onChange={event => setSignup({ ...signup, weeklySportFrequency: event.target.value })} required><option value="" disabled>Select</option><option value="0">Not currently active</option><option value="1-2">1–2 times</option><option value="3-4">3–4 times</option><option value="5+">5+ times</option></select></label><label>Sport You Want To Practice<input value={signup.aspirationalSport} onChange={event => setSignup({ ...signup, aspirationalSport: event.target.value })} required /></label><label className="partner-span-2">Sports You Currently Practice<input placeholder="For example: Football, cycling, strength training" value={signup.currentSports} onChange={event => setSignup({ ...signup, currentSports: event.target.value })} required /></label><label className="partner-span-2">Sports Problems You Think Should Be Solved<textarea value={signup.sportsChallenges} onChange={event => setSignup({ ...signup, sportsChallenges: event.target.value })} required /></label><label className="partner-span-2">Your Idea To Solve A Sports Problem<textarea value={signup.sportsSolutionIdea} onChange={event => setSignup({ ...signup, sportsSolutionIdea: event.target.value })} required /></label></div></div>
+          <div className="partner-form-grid"><label>First Name<input autoComplete="given-name" value={signup.firstName} onChange={event => setSignup({ ...signup, firstName: event.target.value })} required /></label><label>Family Name<input autoComplete="family-name" value={signup.familyName} onChange={event => setSignup({ ...signup, familyName: event.target.value })} required /></label><label>Work Email Address<input type="email" autoComplete="email" value={signup.email} onChange={event => setSignup({ ...signup, email: event.target.value })} required /></label><label>Mobile Number <small>REQUIRED</small><input type="tel" autoComplete="tel" value={signup.mobileNumber} onChange={event => setSignup({ ...signup, mobileNumber: event.target.value })} required /></label><label>Age<input type="number" min="13" max="120" inputMode="numeric" value={signup.age} onChange={event => setSignup({ ...signup, age: event.target.value })} required /></label><label>Password<small>MINIMUM 7 CHARACTERS</small><input type="password" autoComplete="new-password" minLength={7} value={signup.password} onChange={event => setSignup({ ...signup, password: event.target.value })} required /></label><label>Confirm Password<input type="password" autoComplete="new-password" minLength={7} value={signup.confirmPassword} onChange={event => setSignup({ ...signup, confirmPassword: event.target.value })} required /></label></div>
           <label className="partner-honeypot" aria-hidden="true">Website<input tabIndex={-1} autoComplete="off" value={signup.website} onChange={event => setSignup({ ...signup, website: event.target.value })} /></label>
-          <label className="partner-profile-image"><span><ImagePlus size={17} /> Profile Image <small>OPTIONAL · JPEG, PNG, OR WEBP · 2 MB MAX</small></span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleProfileImage} />{profileImage && <span className="partner-image-preview"><img src={profileImage.preview} alt="Selected profile preview" />Image selected</span>}</label>
           <button className="partner-primary" disabled={signupMutation.isPending}>{signupMutation.isPending ? "CREATING…" : <>CONTINUE <ArrowRight size={17} /></>}</button>
         </form>}
         {step === "forgot" && <form className="partner-gateway-stage" onSubmit={submitForgot}>

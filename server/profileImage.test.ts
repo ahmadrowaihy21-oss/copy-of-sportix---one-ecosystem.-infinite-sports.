@@ -3,14 +3,14 @@ import { validateProfileImagePayload } from "./profileImage";
 import { partnerSignupInput } from "./routers";
 
 const validProfile = {
-  fullName: "SPORTIX Profile Test", email: "profile@example.com", mobileNumber: "+966501234567", password: "ProfileTest_2026!Secure", age: 27, gender: "male", weeklySportFrequency: "3-4", currentSports: "Football, running", aspirationalSport: "Cycling", sportsChallenges: "Finding suitable community sessions and verified local opportunities.", sportsSolutionIdea: "A single profile that connects athletes to verified local activity and progression paths.",
+  firstName: "SPORTIX", familyName: "Profile Test", email: "profile@example.com", mobileNumber: "+966501234567", password: "ProfileTest_2026!Secure", age: 27,
 };
 
-describe("SPORTIX Partners complete athlete profile", () => {
-  it("requires every mandatory athlete-profile answer on new registration", () => {
-    expect(partnerSignupInput.parse(validProfile)).toMatchObject({ age: 27, gender: "male", weeklySportFrequency: "3-4" });
-    expect(() => partnerSignupInput.parse({ ...validProfile, currentSports: "" })).toThrow();
-    expect(() => partnerSignupInput.parse({ ...validProfile, sportsSolutionIdea: "short" })).toThrow();
+describe("SPORTIX Partners registration profile", () => {
+  it("accepts the reduced registration profile without athlete-profile questions", () => {
+    expect(partnerSignupInput.parse(validProfile)).toMatchObject({ age: 27, firstName: "SPORTIX", familyName: "Profile Test" });
+    expect(() => partnerSignupInput.parse({ ...validProfile, firstName: "" })).toThrow();
+    expect(() => partnerSignupInput.parse({ ...validProfile, familyName: "" })).toThrow();
   });
 
   it("accepts only supported image signatures and rejects deceptive image payloads", () => {

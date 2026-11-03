@@ -22,7 +22,6 @@ import {
   revokePartnerSession,
   updatePartnerLastLogin,
   markPartnerEmailVerifiedActive,
-  updatePartnerProfileImage,
   updateContactMessageStatus,
   applyRegisteredUserAccessDecision,
   listRegisteredUsers,
@@ -35,7 +34,6 @@ import {
 import { ENV } from "./_core/env";
 import { MAX_PASSWORD_RESET_ATTEMPTS, MAX_VERIFICATION_ATTEMPTS, PARTNER_PASSWORD_RESET_TTL_MS, PARTNER_SESSION_COOKIE, PARTNER_SESSION_TTL_MS, PARTNER_VERIFICATION_TTL_MS, createPartnerSessionToken, createPartnerVerificationCode, hashPartnerPassword, hashPartnerPasswordResetCode, hashPartnerSessionToken, hashPartnerVerificationCode, normalizePartnerEmail, verifyPartnerPassword } from "./partnerAuth";
 import { sendPartnerPasswordResetEmail, sendPartnerVerificationEmail } from "./partnerEmail";
-import { storePartnerProfileImage } from "./profileImage";
 import { sendSportixContactEmail } from "./resend";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -57,20 +55,12 @@ const recentContactAttempts = new Map<string, number[]>();
 const recentPartnerEmailAttempts = new Map<string, number[]>();
 const recentPartnerSignupIpAttempts = new Map<string, number[]>();
 export const partnerSignupInput = z.object({
-  fullName: z.string().trim().min(2, "Full name is required").max(160),
+  firstName: z.string().trim().min(2, "First name is required").max(80),
+  familyName: z.string().trim().min(2, "Family name is required").max(80),
   email: z.string().trim().email("Enter a valid email address").max(320),
   mobileNumber: z.string().trim().min(7, "Mobile number is required").max(32).regex(/^\+?[0-9][0-9\s().-]{5,30}$/, "Enter a valid mobile number"),
   password: z.string().min(7, "Password must contain at least 7 characters").max(128),
-  companyName: z.string().trim().max(200).optional(),
-  jobTitle: z.string().trim().max(160).optional(),
   age: z.number().int().min(13, "You must be at least 13 years old").max(120, "Enter a valid age"),
-  gender: z.enum(["male", "female"]),
-  weeklySportFrequency: z.enum(["0", "1-2", "3-4", "5+"]),
-  currentSports: z.string().trim().min(2, "Tell us which sports you currently practice").max(1000),
-  aspirationalSport: z.string().trim().min(2, "Tell us which sport you would like to practice").max(160),
-  sportsChallenges: z.string().trim().min(10, "Tell us which sports challenges should be solved").max(3000),
-  sportsSolutionIdea: z.string().trim().min(10, "Tell us about your sports solution idea").max(3000),
-  profileImage: z.object({ base64: z.string().min(4).max(2_900_000), mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]) }).optional(),
   website: z.string().max(200).optional(),
 });
 const partnerLoginInput = z.object({ email: z.string().trim().email(), password: z.string().min(1).max(128) });
@@ -179,21 +169,11 @@ export const appRouter = router({
       const existing = await getPartnerAccountByEmail(email);
       if (existing && existing.status !== "email_unverified") throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email. Please log in." });
       const accountValues = {
-        fullName: input.fullName.trim(), email, mobileNumber: input.mobileNumber.trim(), passwordHash: await hashPartnerPassword(input.password),
-        companyName: input.companyName?.trim() || null, jobTitle: input.jobTitle?.trim() || null,
-        age: input.age, gender: input.gender, weeklySportFrequency: input.weeklySportFrequency,
-        currentSports: input.currentSports.trim(), aspirationalSport: input.aspirationalSport.trim(), sportsChallenges: input.sportsChallenges.trim(), sportsSolutionIdea: input.sportsSolutionIdea.trim(),
+        fullName: `${input.firstName.trim()} ${input.familyName.trim()}`, email, mobileNumber: input.mobileNumber.trim(), passwordHash: await hashPartnerPassword(input.password),
+        age: input.age,
       };
       const accountId = existing ? existing.id : (await createPendingPartnerAccount(accountValues)).id;
       if (existing) await refreshPendingPartnerAccount(accountId, accountValues);
-      if (input.profileImage) {
-        try {
-          const image = await storePartnerProfileImage(accountId, input.profileImage);
-          await updatePartnerProfileImage(accountId, image);
-        } catch (error) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: error instanceof Error ? error.message : "Profile image could not be saved." });
-        }
-      }
       const code = createPartnerVerificationCode();
       const emailResult = await sendPartnerVerificationEmail({ email, fullName: accountValues.fullName, code });
       await createPartnerVerificationRecord({ accountId, codeHash: hashPartnerVerificationCode(accountId, code), expiresAt: new Date(Date.now() + PARTNER_VERIFICATION_TTL_MS), requestIp, resendEmailId: emailResult.id });

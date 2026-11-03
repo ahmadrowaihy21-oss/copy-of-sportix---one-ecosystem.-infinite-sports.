@@ -22,3 +22,5 @@
 - [x] Publish the canonical-domain and NDA notification correction, then provide the new live version.
 - [x] Remove the NDA upload, review, approval, notification, and approval-gated access workflow while preserving verified-email registration and server-side access enforcement.
 - [x] Update tests and UI for the no-NDA registration flow, run checks/build, and publish a new checkpoint.
+- [x] Replace the partner signup questions with required first name, family name, email, mobile, and age fields only; retain password credentials for account security.
+- [x] Run full verification, publish the simplified registration flow, and confirm the live checkpoint.

@@ -2,19 +2,12 @@ import { describe, expect, it } from "vitest";
 import { partnerPasswordResetInput, partnerSignupInput } from "./routers";
 
 const validSignup = {
-  fullName: "SPORTIX Test User",
+  firstName: "SPORTIX",
+  familyName: "Test User",
   email: "test.user@example.com",
   mobileNumber: "+966501234567",
   password: "1234567",
-  companyName: undefined,
-  jobTitle: undefined,
   age: 28,
-  gender: "male" as const,
-  weeklySportFrequency: "3-4" as const,
-  currentSports: "Football and strength training",
-  aspirationalSport: "Cycling",
-  sportsChallenges: "Finding consistent training opportunities",
-  sportsSolutionIdea: "A trusted platform for sports connections",
 };
 
 describe("SPORTIX partner registration validation", () => {
@@ -22,6 +15,13 @@ describe("SPORTIX partner registration validation", () => {
     expect(partnerSignupInput.safeParse(validSignup).success).toBe(true);
     expect(partnerSignupInput.safeParse({ ...validSignup, mobileNumber: "" }).success).toBe(false);
     expect(partnerSignupInput.safeParse({ ...validSignup, password: "123456" }).success).toBe(false);
+  });
+
+  it("does not require the removed company or sport-profile questions", () => {
+    expect(partnerSignupInput.safeParse(validSignup).success).toBe(true);
+    expect(partnerSignupInput.safeParse({ ...validSignup, firstName: "" }).success).toBe(false);
+    expect(partnerSignupInput.safeParse({ ...validSignup, familyName: "" }).success).toBe(false);
+    expect(partnerSignupInput.safeParse({ ...validSignup, age: undefined }).success).toBe(false);
   });
 
   it("accepts the password reset OTP contract with the seven-character minimum", () => {
