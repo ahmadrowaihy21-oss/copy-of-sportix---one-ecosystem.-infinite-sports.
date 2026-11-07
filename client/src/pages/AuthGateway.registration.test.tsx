@@ -23,7 +23,14 @@ vi.mock("@/lib/trpc", () => ({
 import AuthGateway from "./AuthGateway";
 
 describe("SPORTIX partner registration and recovery UI", () => {
-  afterEach(() => cleanup());
+  afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+  it("keeps sign-up reachable when browser session storage is blocked", () => {
+    vi.spyOn(window, "sessionStorage", "get").mockImplementation(() => { throw new DOMException("Blocked", "SecurityError"); });
+    render(<AuthGateway onAuthenticated={() => undefined} />);
+    fireEvent.click(screen.getByRole("button", { name: /^sign up/i }));
+    expect(screen.getByRole("heading", { name: /CREATE ACCESS/i })).toBeTruthy();
+  });
+
   it("requires mobile data and advertises the seven-character password minimum", () => {
     render(<AuthGateway onAuthenticated={() => undefined} />);
     fireEvent.click(screen.getByRole("button", { name: /^sign up/i }));

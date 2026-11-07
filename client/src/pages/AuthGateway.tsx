@@ -1,5 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
+import { getSessionStorage, readSessionValue, removeSessionValue, writeSessionValue } from "@/lib/sessionStorage";
 import SportixBrandMark from "../components/SportixBrandMark";
 import { ArrowRight, CircleAlert, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
 import React, { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
@@ -10,8 +11,8 @@ const logoUrl = "/manus-storage/sportix-ecosystem-approved-logo_e0eb06c5.png";
 type GatewayStep = "landing" | "login" | "signup" | "verify" | "forgot" | "reset";
 export const PENDING_VERIFICATION_EMAIL_KEY = "sportix-partners-pending-verification-email";
 
-export function readPendingVerificationEmail(storage: Pick<Storage, "getItem">) {
-  const email = storage.getItem(PENDING_VERIFICATION_EMAIL_KEY)?.trim().toLowerCase() ?? "";
+export function readPendingVerificationEmail(storage: Pick<Storage, "getItem"> | undefined) {
+  const email = readSessionValue(PENDING_VERIFICATION_EMAIL_KEY, storage)?.trim().toLowerCase() ?? "";
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
 }
 
@@ -34,7 +35,7 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
   const utils = trpc.useUtils();
 
   useEffect(() => {
-    const pendingEmail = readPendingVerificationEmail(window.sessionStorage);
+    const pendingEmail = readPendingVerificationEmail(getSessionStorage());
     if (pendingEmail) {
       setVerificationEmail(pendingEmail);
       setStep("verify");
@@ -46,11 +47,11 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
     onError: error => setMessage(getErrorMessage(error, "We could not sign you in.")),
   });
   const signupMutation = trpc.partnerAuth.signUp.useMutation({
-    onSuccess: ({ email }) => { window.sessionStorage.setItem(PENDING_VERIFICATION_EMAIL_KEY, email); setVerificationEmail(email); setDigits(["", "", "", "", "", ""]); setMessage(""); setStep("verify"); },
+    onSuccess: ({ email }) => { writeSessionValue(PENDING_VERIFICATION_EMAIL_KEY, email); setVerificationEmail(email); setDigits(["", "", "", "", "", ""]); setMessage(""); setStep("verify"); },
     onError: error => setMessage(getErrorMessage(error, "We could not create your account.")),
   });
   const verifyMutation = trpc.partnerAuth.verifyEmail.useMutation({
-    onSuccess: async () => { window.sessionStorage.removeItem(PENDING_VERIFICATION_EMAIL_KEY); await utils.partnerAuth.session.invalidate(); setMessage(""); onAuthenticated(); },
+    onSuccess: async () => { removeSessionValue(PENDING_VERIFICATION_EMAIL_KEY); await utils.partnerAuth.session.invalidate(); setMessage(""); onAuthenticated(); },
     onError: error => setMessage(getErrorMessage(error, "The verification code could not be accepted.")),
   });
   const resendMutation = trpc.partnerAuth.resendCode.useMutation({
@@ -66,7 +67,7 @@ export default function AuthGateway({ onAuthenticated }: { onAuthenticated: () =
     onError: error => setMessage(getErrorMessage(error, "Password could not be updated.")),
   });
 
-  const selectStep = (next: GatewayStep) => { if (step === "verify" && next !== "verify") window.sessionStorage.removeItem(PENDING_VERIFICATION_EMAIL_KEY); setMessage(""); setStep(next); };
+  const selectStep = (next: GatewayStep) => { if (step === "verify" && next !== "verify") removeSessionValue(PENDING_VERIFICATION_EMAIL_KEY); setMessage(""); setStep(next); };
   const submitLogin = (event: FormEvent) => { event.preventDefault(); setMessage(""); loginMutation.mutate(login); };
   const submitSignup = (event: FormEvent) => {
     event.preventDefault();

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import type { MarketplaceProduct } from "./marketplaceData";
+import { readSessionValue, writeSessionValue } from "@/lib/sessionStorage";
 
 export const MEMBER_POINTS_BALANCE = 1240;
 export const POINTS_REDEMPTION_STEP = 1000;
@@ -17,14 +18,9 @@ export type CheckoutTotals = {
 
 const CART_STORAGE_KEY = "sportix-marketplace-cart-v1";
 
-function hasSessionStorage() {
-  return typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
-}
-
 export function readStoredCart(): CartItem[] {
-  if (!hasSessionStorage()) return [];
   try {
-    const parsed = JSON.parse(window.sessionStorage.getItem(CART_STORAGE_KEY) ?? "[]") as CartItem[];
+    const parsed = JSON.parse(readSessionValue(CART_STORAGE_KEY) ?? "[]") as CartItem[];
     return Array.isArray(parsed)
       ? parsed.filter((item) => item?.product?.id && Number.isInteger(item.quantity) && item.quantity > 0)
       : [];
@@ -34,7 +30,7 @@ export function readStoredCart(): CartItem[] {
 }
 
 function storeCart(items: CartItem[]) {
-  if (hasSessionStorage()) window.sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  writeSessionValue(CART_STORAGE_KEY, JSON.stringify(items));
 }
 
 export function getCartSubtotal(items: CartItem[]): number {
