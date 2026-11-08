@@ -1,7 +1,7 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getSessionStorage, readSessionValue, removeSessionValue, writeSessionValue } from "./sessionStorage";
-import { useMarketplaceCart } from "../pages/marketplaceCommerce";
+import { MarketplaceCartProvider, useMarketplaceCart } from "../pages/marketplaceCommerce";
 import { marketplaceProducts } from "../pages/marketplaceData";
 
 afterEach(() => {
@@ -24,7 +24,7 @@ describe("optional browser session storage", () => {
     expect(readSessionValue("pending")).toBeNull();
     expect(() => writeSessionValue("pending", "member@example.com")).not.toThrow();
     expect(() => removeSessionValue("pending")).not.toThrow();
-    const { result } = renderHook(() => useMarketplaceCart());
+    const { result } = renderHook(() => useMarketplaceCart(), { wrapper: MarketplaceCartProvider });
     act(() => result.current.addProduct(marketplaceProducts[0]));
     expect(result.current.itemCount).toBe(1);
     expect(result.current.subtotal).toBe(marketplaceProducts[0].priceSar);
@@ -32,7 +32,7 @@ describe("optional browser session storage", () => {
 
   it("keeps cart changes in memory when storage quota is exhausted", () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new DOMException("Full", "QuotaExceededError"); });
-    const { result } = renderHook(() => useMarketplaceCart());
+    const { result } = renderHook(() => useMarketplaceCart(), { wrapper: MarketplaceCartProvider });
     act(() => result.current.addProduct(marketplaceProducts[0]));
     expect(result.current.itemCount).toBe(1);
     act(() => result.current.clearCart());

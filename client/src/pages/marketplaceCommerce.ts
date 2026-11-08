@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { MarketplaceProduct } from "./marketplaceData";
-import { readSessionValue, writeSessionValue } from "@/lib/sessionStorage";
+import { getSessionStorage, readSessionValue, removeSessionValue } from "@/lib/sessionStorage";
 
 export const MEMBER_POINTS_BALANCE = 1240;
 export const POINTS_REDEMPTION_STEP = 1000;
@@ -30,7 +30,14 @@ export function readStoredCart(): CartItem[] {
 }
 
 function storeCart(items: CartItem[]) {
-  writeSessionValue(CART_STORAGE_KEY, JSON.stringify(items));
+  const storage = getSessionStorage();
+  if (!storage) return;
+  try {
+    storage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // A failed write must not restore an older cart on the next page load.
+    removeSessionValue(CART_STORAGE_KEY);
+  }
 }
 
 export function getCartSubtotal(items: CartItem[]): number {
@@ -70,15 +77,13 @@ export function calculateCheckoutTotals(items: CartItem[], memberPoints: number,
   };
 }
 
-export function useMarketplaceCart() {
+function useCartState() {
   const [items, setItems] = useState<CartItem[]>(readStoredCart);
 
+  useEffect(() => storeCart(items), [items]);
+
   const updateItems = useCallback((recipe: (current: CartItem[]) => CartItem[]) => {
-    setItems((current) => {
-      const next = recipe(current);
-      storeCart(next);
-      return next;
-    });
+    setItems(recipe);
   }, []);
 
   const addProduct = useCallback((product: MarketplaceProduct) => {
@@ -98,4 +103,18 @@ export function useMarketplaceCart() {
   const itemCount = useMemo(() => items.reduce((count, item) => count + item.quantity, 0), [items]);
   const subtotal = useMemo(() => getCartSubtotal(items), [items]);
   return { items, itemCount, subtotal, addProduct, setQuantity, removeProduct, clearCart };
+}
+
+const MarketplaceCartContext = createContext<ReturnType<typeof useCartState> | null>(null);
+
+// Keep one in-memory cart above the routes; storage is only a recovery cache.
+export function MarketplaceCartProvider({ children }: { children: ReactNode }) {
+  const cart = useCartState();
+  return createElement(MarketplaceCartContext.Provider, { value: cart }, children);
+}
+
+export function useMarketplaceCart() {
+  const cart = useContext(MarketplaceCartContext);
+  if (!cart) throw new Error("Marketplace cart requires MarketplaceCartProvider");
+  return cart;
 }

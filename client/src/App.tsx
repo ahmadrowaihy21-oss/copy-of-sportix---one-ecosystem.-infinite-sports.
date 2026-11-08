@@ -16,6 +16,7 @@ import MembershipRequests from "./pages/MembershipRequests";
 import Marketplace from "./pages/Marketplace";
 import MarketplaceCart from "./pages/MarketplaceCart";
 import MarketplaceCheckout from "./pages/MarketplaceCheckout";
+import { MarketplaceCartProvider } from "./pages/marketplaceCommerce";
 import GoSportix from "./pages/GoSportix";
 import IndividualAccess from "./pages/IndividualAccess";
 import ProtectedWatermark from "./components/ProtectedWatermark";
@@ -67,7 +68,9 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <MarketplaceCartProvider>
+            <Router />
+          </MarketplaceCartProvider>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

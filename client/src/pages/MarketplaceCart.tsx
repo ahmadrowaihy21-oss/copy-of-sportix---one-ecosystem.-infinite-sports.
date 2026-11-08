@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowUpLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { MEMBER_POINTS_BALANCE, useMarketplaceCart } from "./marketplaceCommerce";
 import "./marketplaceCommerce.css";
 
@@ -13,7 +13,7 @@ export default function MarketplaceCart() {
   return (
     <div className="marketplace-page market-flow-page" dir="rtl">
       <header className="market-flow-header">
-        <a className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></a>
+        <Link className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></Link>
         <button className="market-flow-back" type="button" onClick={() => setLocation("/marketplace")}><ArrowLeft size={17} /> متابعة التسوق</button>
       </header>
       <main className="market-flow-main market-shell">
