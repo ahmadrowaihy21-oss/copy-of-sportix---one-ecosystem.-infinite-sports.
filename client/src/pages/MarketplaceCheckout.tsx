@@ -1,6 +1,6 @@
 import { ArrowLeft, BadgeCheck, CreditCard, MapPin, Minus, ShieldCheck, ShoppingBag, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { calculateCheckoutTotals, getRedeemablePoints, MEMBER_POINTS_BALANCE, useMarketplaceCart } from "./marketplaceCommerce";
 import "./marketplaceCommerce.css";
 
@@ -16,16 +16,16 @@ export default function MarketplaceCheckout() {
   const totals = calculateCheckoutTotals(items, MEMBER_POINTS_BALANCE, usePoints ? redeemablePoints : 0);
 
   if (!items.length && !isComplete) {
-    return <div className="marketplace-page market-flow-page" dir="rtl"><header className="market-flow-header"><a className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></a></header><main className="market-flow-main market-shell"><section className="market-cart-empty"><ShoppingBag size={32} /><h2>لا يمكن إتمام الطلب بسلة فارغة.</h2><button type="button" onClick={() => setLocation("/marketplace")}>العودة إلى المنتجات <ArrowLeft size={17} /></button></section></main></div>;
+    return <div className="marketplace-page market-flow-page" dir="rtl"><header className="market-flow-header"><Link className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></Link></header><main className="market-flow-main market-shell"><section className="market-cart-empty"><ShoppingBag size={32} /><h2>لا يمكن إتمام الطلب بسلة فارغة.</h2><button type="button" onClick={() => setLocation("/marketplace")}>العودة إلى المنتجات <ArrowLeft size={17} /></button></section></main></div>;
   }
 
   if (isComplete) {
-    return <div className="marketplace-page market-flow-page" dir="rtl"><header className="market-flow-header"><a className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></a></header><main className="market-flow-main market-shell"><section className="market-order-success"><div><BadgeCheck size={37} /></div><p className="market-eyebrow">SPORTIX / PROTOTYPE ORDER</p><h1>تم تسجيل<br /><em>طلبك التجريبي.</em></h1><p>لم يتم تنفيذ أي عملية دفع أو خصم فعلي للنقاط. هذه الشاشة تشرح رحلة إتمام الطلب المقترحة للمستخدم.</p><button type="button" onClick={() => setLocation("/marketplace")}>العودة إلى المتجر <ArrowLeft size={17} /></button></section></main></div>;
+    return <div className="marketplace-page market-flow-page" dir="rtl"><header className="market-flow-header"><Link className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></Link></header><main className="market-flow-main market-shell"><section className="market-order-success"><div><BadgeCheck size={37} /></div><p className="market-eyebrow">SPORTIX / PROTOTYPE ORDER</p><h1>تم تسجيل<br /><em>طلبك التجريبي.</em></h1><p>لم يتم تنفيذ أي عملية دفع أو خصم فعلي للنقاط. هذه الشاشة تشرح رحلة إتمام الطلب المقترحة للمستخدم.</p><button type="button" onClick={() => setLocation("/marketplace")}>العودة إلى المتجر <ArrowLeft size={17} /></button></section></main></div>;
   }
 
   return (
     <div className="marketplace-page market-flow-page" dir="rtl">
-      <header className="market-flow-header"><a className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></a><button className="market-flow-back" type="button" onClick={() => setLocation("/marketplace/cart")}><ArrowLeft size={17} /> العودة إلى السلة</button></header>
+      <header className="market-flow-header"><Link className="market-brand" href="/marketplace"><img src={logoUrl} alt="SPORTIX" /><span>MARKETPLACE</span></Link><button className="market-flow-back" type="button" onClick={() => setLocation("/marketplace/cart")}><ArrowLeft size={17} /> العودة إلى السلة</button></header>
       <main className="market-flow-main market-shell">
         <div className="market-flow-kicker"><CreditCard size={17} /><span>إتمام الطلب / الدفع التجريبي</span></div>
         <div className="market-flow-heading"><div><p className="market-eyebrow">SPORTIX / CHECKOUT</p><h1>أتمم طلبك<br /><em>بوضوح.</em></h1></div><p>استخدم رصيد نقاط العضو قبل اختيار وسيلة الدفع، ثم راجع القيمة المتبقية بالريال السعودي.</p></div>

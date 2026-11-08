@@ -20,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import "./marketplace.css";
 import { useMarketplaceCart } from "./marketplaceCommerce";
 import {
@@ -133,15 +133,15 @@ export default function Marketplace() {
     <div className="marketplace-page" dir="rtl">
       <div className="market-noise" aria-hidden="true" />
       <header className="market-header">
-        <a className="market-brand" href="/" aria-label="العودة إلى SPORTIX">
+        <Link className="market-brand" href="/" aria-label="العودة إلى SPORTIX">
           <img src={logoUrl} alt="SPORTIX" />
           <span>MARKETPLACE</span>
-        </a>
+        </Link>
         <nav className={`market-nav ${menuOpen ? "is-open" : ""}`} aria-label="أقسام السوق">
           <button className={activeSection === "products" ? "is-active" : ""} type="button" onClick={() => scrollToSection("products")}>المنتجات</button>
           <button className={activeSection === "benefits" ? "is-active" : ""} type="button" onClick={() => scrollToSection("benefits")}>الكوبونات والعضويات</button>
           <button className={activeSection === "impact" ? "is-active" : ""} type="button" onClick={() => scrollToSection("impact")}>SPORTIX Impact</button>
-          <a href="/" className="market-back-link">المنصة <ArrowLeft size={15} /></a>
+          <Link href="/" className="market-back-link">المنصة <ArrowLeft size={15} /></Link>
         </nav>
         <div className="market-header-actions">
           <button className="market-bag-status" type="button" onClick={() => setLocation("/marketplace/cart")} aria-label={`فتح السلة، ${itemCount} عناصر`}><ShoppingBag size={16} /> <span>{itemCount}</span><b>السلة</b></button>
@@ -280,7 +280,7 @@ export default function Marketplace() {
         </section>
 
         <section className="market-closing">
-          <div className="market-shell market-closing-inner"><p className="market-eyebrow">SPORTIX / GOVERNED VALUE</p><h2>تتحرّك.<br /><em>وتختار المعنى.</em></h2><p>هذا البروتوتايب يضع المنتج والوصول والأثر في تجربة واحدة، مع فصل واضح بين الاستكشاف التجريبي وأي عملية شراء أو استرداد فعلية.</p><a href="/">العودة إلى SPORTIX <ArrowLeft size={17} /></a></div>
+          <div className="market-shell market-closing-inner"><p className="market-eyebrow">SPORTIX / GOVERNED VALUE</p><h2>تتحرّك.<br /><em>وتختار المعنى.</em></h2><p>هذا البروتوتايب يضع المنتج والوصول والأثر في تجربة واحدة، مع فصل واضح بين الاستكشاف التجريبي وأي عملية شراء أو استرداد فعلية.</p><Link href="/">العودة إلى SPORTIX <ArrowLeft size={17} /></Link></div>
         </section>
       </main>
     </div>
