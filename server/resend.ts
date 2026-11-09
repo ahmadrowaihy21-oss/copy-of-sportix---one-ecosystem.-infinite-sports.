@@ -141,6 +141,7 @@ export async function sendSportixContactEmail(payload: ContactEmailPayload): Pro
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
+    signal: AbortSignal.timeout(10_000),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
@@ -151,7 +152,7 @@ export async function sendSportixContactEmail(payload: ContactEmailPayload): Pro
   });
 
   const responseBody = await response.json().catch(() => ({}));
-  if (!response.ok || typeof responseBody.id !== "string") {
+  if (!response.ok || (typeof responseBody?.id !== "string" || !responseBody.id.trim())) {
     const message = typeof responseBody?.message === "string" ? responseBody.message : `Resend rejected the request (${response.status})`;
     throw new Error(message);
   }

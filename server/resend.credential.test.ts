@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 describe("Resend credential readiness", () => {
-  it.skipIf(!process.env.RESEND_API_KEY)("authenticates a lightweight domain-list request without exposing the key", async () => {
+  it("authenticates a lightweight domain-list request without exposing the key", async () => {
     const apiKey = process.env.RESEND_API_KEY;
 
     expect(apiKey).toBeTruthy();
